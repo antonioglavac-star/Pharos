@@ -1,9 +1,7 @@
 // Karta otoka u stilu stare pomorske karte: obrisi tankom linijom, linije dubine, iscrtkano kopno.
 let sel = null;
 
-// Kopno i Pelješac (pojednostavljeno, isti koordinatni sustav kao otoci u islands.js)
-const COAST = 'M40 0L70 8L81 21L142 24L184 27L239 48L311 93L380 135L440 150V0Z';
-const PELJESAC = 'M440 168L380 172L313 180L318 188L380 186L440 182Z';
+// Obrisi obale i otoka su u js/chart.js (prema OpenStreetMapu)
 
 function islandStatus(i){
   const I = ISLANDS[i];
@@ -23,28 +21,29 @@ function showMap(){
 }
 
 function renderMap(){
-  const lines = [];
-  for (let x=55; x<440; x+=110) lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="390"/>`);
-  for (let y=65; y<390; y+=110) lines.push(`<line x1="0" y1="${y}" x2="440" y2="${y}"/>`);
+  const W = CHART.w, H = CHART.h, lines = [];
+  for (let x=55; x<W; x+=110) lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="${H}"/>`);
+  for (let y=65; y<H; y+=110) lines.push(`<line x1="0" y1="${y}" x2="${W}" y2="${y}"/>`);
   const isles = ISLANDS.map((I,i) => {
-    const st = islandStatus(i), r = `rotate(${I.rot})`;
-    return `<g class="isle ${st} ${I.id===sel?'sel':''}" data-id="${I.id}" tabindex="0" role="button"
-        aria-label="${I.name}, ${STATUS_LABEL[st]}" transform="translate(${I.x} ${I.y})">
-      <ellipse class="hit" rx="${I.rx+8}" ry="${Math.max(I.ry+8,18)}" transform="${r}"/>
-      <ellipse class="ring" rx="${I.rx+9}" ry="${I.ry+9}" transform="${r}"/>
-      <ellipse class="contour" rx="${I.rx+4}" ry="${I.ry+4}" transform="${r}"/>
-      <ellipse class="land" rx="${I.rx}" ry="${I.ry}" transform="${r}"/>
-      ${st==='open'||st==='done' ? '<circle class="lamp" r="2.5"/>' : ''}
-      <text y="${I.ry+16}">${I.name}</text>
+    const st = islandStatus(i), [cx, cy, r, hh] = CHART.c[I.id];
+    // Mali otoci (Palagruža, Svetac) dobiju veće nevidljivo polje za dodir
+    return `<g class="isle ${st} ${I.id===sel?'sel':''}" data-id="${I.id}" tabindex="0" role="button" aria-label="${I.name}, ${STATUS_LABEL[st]}">
+      <circle class="hit" cx="${cx}" cy="${cy}" r="${Math.max(r+6,20)}"/>
+      <path class="contour" d="${CHART.contours[I.id]}"/>
+      <path class="land" d="${CHART.isles[I.id]}"/>
+      ${st==='open'||st==='done' ? `<circle class="lamp" cx="${cx}" cy="${cy}" r="2.5"/>` : ''}
+      <text x="${cx}" y="${hh ? cy+hh+13 : cy+13}">${I.name}</text>
     </g>`;
   }).join('');
+  $('chart').setAttribute('viewBox', `0 0 ${W} ${H}`);
   $('chart').innerHTML = `
     <defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <line x1="0" y1="0" x2="0" y2="5"/></pattern></defs>
     <g class="grat">${lines.join('')}</g>
-    <path class="coast" d="${COAST}"/><path class="coast" d="${PELJESAC}"/>
-    <g class="rose" transform="translate(395 330)">
+    <path class="coast" d="${CHART.land}"/>
+    <g class="rose" transform="translate(${W-45} ${H-55})">
       <path d="M0-22L4-4L22 0L4 4L0 22L-4 4L-22 0L-4-4Z"/><text y="-27">S</text></g>
+    <text class="osm" x="6" y="${H-6}">© OpenStreetMap</text>
     ${isles}`;
   $('chart').querySelectorAll('.isle').forEach(g => {
     g.onclick = () => { sel = g.dataset.id; renderMap(); };

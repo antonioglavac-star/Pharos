@@ -22,6 +22,7 @@ Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač rije
 - `js/islands/<otok>.js` – razine jednog otoka, npr. `js/islands/vis.js` puni `LEVELS.vis`
 - `js/game.js` – logika igre: crtanje mreže, okretanje ogledala, praćenje zrake, pobjeda, spremanje napretka
 - `js/map.js` – karta otoka i kartica odabranog otoka
+- `js/chart.js` – obrisi obale i otoka prema OpenStreetMapu (stvara ga `tools/build-chart.js`, ne mijenjati ručno; upute su na vrhu alata). Navođenje izvora „© OpenStreetMap” mora ostati na karti i u „O igri”
 - `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.png` (prozirna pozadina) i `icon-*.png` su pripremljene verzije za igru
 - `docs/testiranje.md` – bilješke s testiranja s igračima (za portfolio)
 - `manifest.webmanifest` – ime i ikona kad se igra doda na početni zaslon mobitela
@@ -78,7 +79,7 @@ Oznake ćelija:
 2. ~~Otoci kao zasebne datoteke, spremanje napretka, probna karta~~ (gotovo)
 3. Dovršiti otok Vis do 15–20 razina s postupnim rastom težine (16 razina složeno, čeka igranje i dotjerivanje)
 4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; ~~Svetac~~ – 12 razina, magla; Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
-5. Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora) i karta s pomicanjem i zumiranjem za cijelu obalu
+5. ~~Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora)~~ (gotovo za srednju i južnu Dalmaciju); još treba karta s pomicanjem i zumiranjem za cijelu obalu
 6. ~~Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija~~ (gotovo, uz postavke u izborniku)
 7. UX dokumentacija: persona, user flow, wireframeovi (za portfolio)
 

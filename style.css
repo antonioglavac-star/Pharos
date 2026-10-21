@@ -165,21 +165,21 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .chart svg{display:block;width:100%;height:auto}
 .grat line{stroke:var(--line);stroke-width:.6}
 #hatch line{stroke:var(--sand-dim);stroke-width:.7}
-.coast{fill:url(#hatch);stroke:var(--sand);stroke-width:1;stroke-opacity:.7}
+.coast{fill:url(#hatch);stroke:var(--sand);stroke-width:.6;stroke-opacity:.7;stroke-linejoin:round}
+.chart .osm{fill:var(--sand-dim);font:9px var(--body)}
 .rose path{fill:none;stroke:var(--sand-dim);stroke-width:.8}
 .rose text{fill:var(--sand-dim);font:700 9px var(--body);text-anchor:middle}
 .isle{cursor:pointer;outline:none}
 .isle .hit{fill:transparent}
-.isle .ring{fill:none;stroke:none}
-.isle .contour{fill:none;stroke:var(--sand-dim);stroke-width:.7;stroke-dasharray:2 3}
-.isle .land{fill:var(--sea-2);stroke:var(--sand);stroke-width:1.1}
+.isle .contour{fill:none;stroke:var(--sand-dim);stroke-width:.7;stroke-dasharray:2 3;stroke-linejoin:round}
+.isle .land{fill:var(--sea-2);stroke:var(--sand);stroke-width:.9;stroke-linejoin:round}
 .isle text{fill:var(--sand);font:700 10px var(--body);text-anchor:middle;letter-spacing:.04em}
 .isle.soon .land,.isle.locked .land{stroke:var(--sand-dim)}
 .isle.soon text,.isle.locked text{fill:var(--sand-dim)}
 .isle.done .land{fill:#ffc35a2e;stroke:var(--beam)}
 .isle.done text{fill:var(--beam)}
 .isle .lamp{fill:var(--beam);filter:drop-shadow(0 0 4px var(--beam))}
-.isle.sel .ring,.isle:focus-visible .ring{stroke:var(--beam);stroke-width:1.2}
+.isle.sel .contour,.isle:focus-visible .contour{stroke:var(--beam);stroke-width:1.2;stroke-dasharray:none}
 @media (prefers-reduced-motion:no-preference){ .isle.open .lamp{animation:flicker 2.4s ease-in-out infinite} }
 .card{background:var(--sea-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .card h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0}

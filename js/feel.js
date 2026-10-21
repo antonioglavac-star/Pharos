@@ -55,7 +55,8 @@ const Feel = (() => {
     setTimeout(() => { w.src.stop(); w.lfo.stop(); }, 1500);
   }
 
-  const buzz = p => { if (set.vibrate && navigator.vibrate) navigator.vibrate(p); };
+  // Preglednik dopušta vibraciju tek nakon stvarnog dodira
+  const buzz = p => { if (set.vibrate && navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(p); };
 
   // Prvi dodir bilo gdje pali zvuk; kad je igra u pozadini, zvuk se pauzira
   document.addEventListener('pointerdown', () => { if (set.sound || set.waves){ audio(); startWaves(); } }, { once: true });
