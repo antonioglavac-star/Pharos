@@ -13,13 +13,58 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<section class="start intro" id="start" aria-label="Početni izbornik">
+  <svg class="waves" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 14q25-8 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0"/>
+    <path d="M-30 32q25-8 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0"/>
+    <path d="M0 50q25-8 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0 50 0"/>
+  </svg>
+  <div class="start-inner">
+    <div class="logo-wrap">
+      <div class="sweep" aria-hidden="true"></div>
+      <div class="lamp" aria-hidden="true"></div>
+      <img class="logo" src="assets/logo.png" alt="Pharos" width="951" height="425">
+    </div>
+    <p class="tagline">Upali svjetla Jadrana, otok po otok.</p>
+    <nav class="menu">
+      <button class="btn primary big" id="play">Igraj</button>
+      <button class="btn" id="howBtn">Kako se igra</button>
+      <button class="btn" id="aboutBtn">O igri</button>
+    </nav>
+    <p class="progress" id="startProgress"></p>
+  </div>
+</section>
+
+<dialog class="sheet" id="how" aria-labelledby="howTitle">
+  <h2 id="howTitle">Kako se igra</h2>
+  <ul class="rules">
+    <li><i class="r-mirror"></i><span><b>Dodirni ogledalo</b> da ga okreneš i usmjeriš svjetlo.</span></li>
+    <li><i class="r-boat"></i><span><b>Osvijetli sve brodove</b> i razina je riješena.</span></li>
+    <li><i class="r-prism"></i><span><b>Prizma</b> dijeli zraku na dvije strane.</span></li>
+    <li><i class="r-filter"></i><span><b>Filter</b> boji zraku. Obojeni brod prima samo svoju boju.</span></li>
+    <li><i class="r-cave"></i><span><b>Modra špilja</b> propušta samo plavo svjetlo.</span></li>
+    <li><i class="r-star"></i><span>Riješi u <b>što manje poteza</b> za tri zvjezdice.</span></li>
+  </ul>
+  <form method="dialog"><button class="btn primary">Razumijem</button></form>
+</dialog>
+
+<dialog class="sheet" id="about" aria-labelledby="aboutTitle">
+  <h2 id="aboutTitle">O igri</h2>
+  <p><b>Pharos</b> je opuštajuća logička igra. Kao čuvar svjetionika vodiš zraku svjetla do brodova i otok po otok pališ svjetla duž Jadrana.</p>
+  <p>Ime dolazi od grčkog naziva za Hvar i riječi za svjetionik.</p>
+  <p class="credit">Ideja i dizajn: Antonio Glavač</p>
+  <form method="dialog"><button class="btn primary">Zatvori</button></form>
+</dialog>
+
 <div class="wrap">
   <section class="screen" id="map" hidden>
-    <img class="logo" src="assets/logo.png" alt="Pharos" width="951" height="425">
     <header>
-      <div>
-        <div class="eyebrow">Jadransko more</div>
-        <h1>Karta otoka</h1>
+      <div class="titlebar">
+        <button class="back" id="toMenu" aria-label="Natrag na izbornik">←</button>
+        <div>
+          <div class="eyebrow">Jadransko more</div>
+          <h1>Karta otoka</h1>
+        </div>
       </div>
       <div class="stats">
         <div class="stat"><b id="litCount">0</b><span>Osvijetljeno</span></div>
@@ -81,5 +126,6 @@
 <script src="js/islands/bisevo.js"></script>
 <script src="js/game.js"></script>
 <script src="js/map.js"></script>
+<script src="js/menu.js"></script>
 </body>
 </html>

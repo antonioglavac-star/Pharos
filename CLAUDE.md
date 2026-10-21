@@ -14,7 +14,8 @@ Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač rije
 
 ## Struktura
 
-- `index.html` – dva ekrana: karta (`#map`) i igra (`#game`)
+- `index.html` – tri ekrana: početni izbornik (`#start`), karta (`#map`) i igra (`#game`), te prozori „Kako se igra” (`#how`) i „O igri” (`#about`)
+- `js/menu.js` – početni izbornik i animacija pokretanja (lampa se upali, zraka obiđe nebo i stane na natpisu; dodir je preskače; isključena uz smanjeno kretanje)
 - `style.css` – izgled (boje su tokeni u `:root`)
 - `js/islands.js` – popis otoka redom otključavanja (`ISLANDS`), boje zraka (`COL`) i prazni `LEVELS`
 - `js/islands/<otok>.js` – razine jednog otoka, npr. `js/islands/vis.js` puni `LEVELS.vis`

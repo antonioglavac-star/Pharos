@@ -79,7 +79,54 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 
 /* Karta: pomorska karta u liniji boje pijeska na mornarsko plavoj; jedina topla boja je svjetlo */
-.logo{display:block;width:min(78%,300px);height:auto;margin:-6px auto -10px}
+/* Početni izbornik: cijeli ekran, logo s lampom, gumbi, valovi linijom pijeska */
+.start{position:fixed;inset:0;z-index:5;display:grid;place-items:center;overflow:hidden;padding:24px 16px calc(24px + env(safe-area-inset-bottom,0px));
+  background:radial-gradient(120% 70% at 50% 0%, var(--sea-2), var(--sea) 70%);background-color:var(--sea)}
+.start-inner{position:relative;z-index:1;width:min(100%,420px);display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.logo-wrap{position:relative;width:min(94%,380px)}
+.logo{display:block;width:100%;height:auto;position:relative}
+.lamp,.sweep{position:absolute;left:12.6%;top:39.1%;pointer-events:none}
+.lamp{width:30%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle,#fff6d8 0 5%,#ffc35a88 16%,#ffc35a00 62%)}
+.sweep{width:260vmax;height:44vmax;translate:0 -50%;transform-origin:0 50%;rotate:-6deg;opacity:0;
+  clip-path:polygon(0 49.5%,100% 0,100% 100%,0 50.5%);background:linear-gradient(90deg,#ffe2a0dd,#ffc35a44 25%,#ffc35a00 55%)}
+.tagline{margin:0;color:var(--sand);font-size:15px}
+.menu{display:flex;flex-direction:column;gap:10px;width:min(100%,260px)}
+.btn.big{font-size:17px;padding:14px 18px}
+.progress{margin:0;min-height:1.2em;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.waves{position:absolute;left:-10%;bottom:7%;width:120%;height:60px}
+.waves path{fill:none;stroke:var(--sand-dim);stroke-width:1;vector-effect:non-scaling-stroke}
+@media (prefers-reduced-motion:no-preference){
+  .lamp{animation:flicker 2.4s ease-in-out infinite}
+  .waves{animation:drift 9s ease-in-out infinite alternate}
+  .intro .lamp{animation:lampOn .7s .2s both, flicker 2.4s 1s ease-in-out infinite}
+  .intro .sweep{animation:sweep 1.7s .35s cubic-bezier(.45,0,.2,1) both}
+  .intro .logo{animation:logoIn .7s 1.35s ease-out both}
+  .intro .tagline{animation:rise .5s 1.9s both}
+  .intro .menu>*{animation:rise .5s 2s both}
+  .intro .menu>:nth-child(2){animation-delay:2.1s}
+  .intro .menu>:nth-child(3){animation-delay:2.2s}
+  .intro .progress{animation:rise .5s 2.3s both}
+  .intro .waves{animation:fadeIn 1.2s .6s both, drift 9s 1.8s ease-in-out infinite alternate}
+}
+@keyframes lampOn{from{opacity:0;scale:.2}to{opacity:1;scale:1}}
+@keyframes sweep{0%{rotate:-200deg;opacity:0}15%{opacity:.9}75%{rotate:-6deg;opacity:.9}100%{rotate:-6deg;opacity:0}}
+@keyframes logoIn{from{opacity:0;scale:.94;filter:blur(4px)}to{opacity:1;scale:1;filter:none}}
+@keyframes rise{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
+@keyframes fadeIn{from{opacity:0}}
+@keyframes drift{to{translate:-6% 0}}
+
+/* Prozori "Kako se igra" i "O igri" */
+.sheet{width:min(100% - 32px,400px);max-height:85dvh;border:1px solid var(--line);border-radius:16px;background:var(--sea-2);color:var(--foam);padding:20px;font-family:var(--body)}
+.sheet::backdrop{background:#0a1729cc;backdrop-filter:blur(2px)}
+.sheet h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0 0 14px}
+.sheet p{margin:0 0 10px;color:var(--muted);line-height:1.5}
+.sheet .credit{color:var(--sand);margin-bottom:16px}
+.rules{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:12px}
+.rules li{display:flex;gap:12px;align-items:center;line-height:1.4;color:var(--muted)}
+.rules b{color:var(--foam)}
+.rules i{flex:none;width:36px;height:36px;border-radius:8px;background:var(--cell);border:.5px solid var(--line);display:grid;place-items:center;font-style:normal;color:var(--beam);font-size:18px}
+.rules i .icon{width:84%;height:84%}
+.rules i .mirror{width:80%;height:13%}
 .titlebar{display:flex;align-items:flex-end;gap:10px}
 .back{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--foam);font-size:18px;cursor:pointer;flex:none}
 .back:focus-visible{outline:2px solid var(--beam);outline-offset:2px}

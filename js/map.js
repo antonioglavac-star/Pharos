@@ -14,7 +14,7 @@ function islandStatus(i){
 const STATUS_LABEL = { soon:'uskoro', done:'osvijetljen', open:'otvoren', locked:'zaključan' };
 
 function showMap(){
-  $('game').hidden = true; $('map').hidden = false;
+  $('game').hidden = true; $('start').hidden = true; $('map').hidden = false;
   if (!sel){
     const i = ISLANDS.findIndex((I,i) => islandStatus(i)==='open');
     sel = ISLANDS[i<0 ? 0 : i].id;
@@ -68,5 +68,3 @@ function renderCard(){
     ${btn ? `<button class="btn primary" id="cardBtn">${btn}</button>` : ''}`;
   if (btn) $('cardBtn').onclick = () => openIsland(I.id);
 }
-
-showMap();
