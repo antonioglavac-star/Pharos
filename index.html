@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pharos</title>
+<meta name="theme-color" content="#0a1729">
+<link rel="icon" type="image/png" href="assets/icon-48.png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <section class="screen" id="map" hidden>
+    <img class="logo" src="assets/logo.png" alt="Pharos" width="951" height="425">
+    <header>
+      <div>
+        <div class="eyebrow">Jadransko more</div>
+        <h1>Karta otoka</h1>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="litCount">0</b><span>Osvijetljeno</span></div>
+      </div>
+    </header>
+    <div class="chart">
+      <svg id="chart" viewBox="0 0 440 390" role="group" aria-label="Karta otoka"></svg>
+    </div>
+    <div class="card" id="card" aria-live="polite"></div>
+  </section>
+
+  <section class="screen" id="game" hidden>
+    <header>
+      <div class="titlebar">
+        <button class="back" id="back" aria-label="Natrag na kartu">←</button>
+        <div>
+          <div class="eyebrow" id="island">Otok Vis</div>
+          <h1 id="title">Razina 1</h1>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="moves">0</b><span>Potezi</span></div>
+        <div class="stat"><b id="par">1</b><span>Cilj</span></div>
+      </div>
+    </header>
+
+    <div class="board" id="board">
+      <div class="grid" id="grid"></div>
+      <svg class="coast" id="coast" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <svg class="beams" id="beams" preserveAspectRatio="none"></svg>
+      <div class="win" id="win" hidden>
+        <div>
+          <h2 id="winTitle">Svi brodovi su u luci</h2>
+          <p id="winText"></p>
+          <div class="stars" id="stars"></div>
+          <div class="fact" id="winFact" hidden></div>
+          <button class="btn primary" id="next">Sljedeća razina</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" id="hint"></p>
+
+    <div class="controls">
+      <div class="dots" id="dots"></div>
+      <button class="btn" id="reset">Ispočetka</button>
+    </div>
+    <div class="legend">
+      <span><i style="background:#c9d4e3"></i>Ogledalo – dodirni za okretanje</span>
+      <span><i style="background:#7fd4ff"></i>Prizma – dijeli zraku</span>
+      <span><i style="background:linear-gradient(90deg,#ff6b5e 50%,#4fb6ff 50%)"></i>Filter – boji zraku; brod prima samo svoju boju</span>
+    </div>
+  </section>
+</div>
+
+<script src="js/islands.js"></script>
+<script src="js/islands/vis.js"></script>
+<script src="js/game.js"></script>
+<script src="js/map.js"></script>
+</body>
+</html>

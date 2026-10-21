@@ -1,0 +1,213 @@
+const $ = id => document.getElementById(id);
+let isl, LV, li = 0, state, moves = 0, won = false, toMap = false;
+
+// Napredak: zvjezdice po ID-u razine (npr. 'vis-3'), pa nove razine ne kvare spremljenu igru
+const SAVE_KEY = 'svjetionik-napredak';
+let progress = {};
+try { progress = JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch (e) {}
+function saveStars(id, s){
+  progress[id] = Math.max(progress[id]||0, s);
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {}
+}
+const islandDone = id => !!LEVELS[id] && LEVELS[id].every(L => progress[L.id]);
+// Otok je otvoren ako ima razine i svi prethodni otoci s razinama su osvijetljeni
+const islandOpen = i => !!LEVELS[ISLANDS[i].id] && ISLANDS.slice(0,i).every(I => !LEVELS[I.id] || islandDone(I.id));
+
+const ICONS = {
+  light: d => `<svg class="icon" viewBox="0 0 40 40" style="transform:rotate(${Math.atan2(d[1],d[0])*180/Math.PI}deg)">
+     <circle cx="20" cy="20" r="17" fill="#ffc35a22"/>
+     <g transform="rotate(90 20 20)"><path d="M14 34h12l-2.5-20h-7z" fill="#e9eff7"/><path d="M15 27h10l-.6-5h-8.8z" fill="#d9534f"/>
+     <rect x="15.5" y="9" width="9" height="5" rx="1" fill="#ffc35a"/><path d="M14.5 9h11l-5.5-4z" fill="#d9534f"/></g></svg>`,
+  filter: c => `<svg class="icon" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="7" fill="${COL[c]}" fill-opacity=".38" stroke="${COL[c]}" stroke-width="2.5"/><path d="M14 15l6-3" stroke="#fff9" stroke-width="2" stroke-linecap="round"/></svg>`,
+  boat: c => `<svg class="icon" viewBox="0 0 40 40"><path d="M7 25h26l-4 7H11z" fill="#c9d4e3"/><path class="sail" d="M20 6v17H10z" fill="${c?COL[c]:'#e9eff7'}"/><path d="M21 9v14h8z" fill="#8ea3bf"/><path d="M5 34c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 6 2" stroke="#8ea3bf55" stroke-width="1.5" fill="none"/></svg>`,
+  prism: () => `<svg class="icon" viewBox="0 0 40 40"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bfe9ff"/><stop offset="1" stop-color="#5aa7ff"/></linearGradient></defs><path d="M20 7l13 23H7z" fill="url(#pg)" opacity=".9"/><path d="M20 7l-4 23" stroke="#fff8" stroke-width="1"/></svg>`
+};
+
+// Ćelija je na ploči ako je unutar mreže i, kad razina ima obris (shape), nije označena s '.'
+const onBoard = (L,x,y) => x>=0 && y>=0 && x<L.w && y<L.h && (!L.shape || L.shape[y][x]!=='.');
+
+// Obala: rubovi ćelija ploče spojeni u petlje, pa zaglađeni (stube postaju kose linije)
+// i blago valoviti, uvijek jednako za istu razinu. off pomiče liniju prema moru, amp je jačina valovitosti.
+function coastPath(L, off, amp){
+  const next = {};
+  for (let y=0;y<L.h;y++) for (let x=0;x<L.w;x++) if (onBoard(L,x,y)){
+    if (!onBoard(L,x,y-1)) next[x+','+y] = [x+1,y];
+    if (!onBoard(L,x+1,y)) next[(x+1)+','+y] = [x+1,y+1];
+    if (!onBoard(L,x,y+1)) next[(x+1)+','+(y+1)] = [x,y+1];
+    if (!onBoard(L,x-1,y)) next[x+','+(y+1)] = [x,y];
+  }
+  // Valovitost ovisi o ID-u razine, pa obala ne skače pri ponovnom učitavanju
+  let seed = 0;
+  for (const ch of L.id) seed = (seed*31 + ch.charCodeAt(0)) % 997;
+  const ph = [seed*.37, seed*.91, seed*1.53];
+  let d = '';
+  for (const s of Object.keys(next)){
+    if (!next[s]) continue;
+    const corners = [];
+    for (let k=s; next[k]; ){ const p = next[k]; delete next[k]; corners.push(p); k = p.join(','); }
+    // Gusto točke: četiri po rubu ćelije
+    let pts = [];
+    corners.forEach((a,i) => { const b = corners[(i+1)%corners.length];
+      for (let t=0;t<1;t+=.25) pts.push([a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t]); });
+    const n = pts.length, at = i => pts[(i+n)%n];
+    // Zaglađivanje: svaka točka postaje prosjek susjeda do pola ćelije na svaku stranu (triput)
+    for (let pass=0; pass<3; pass++){
+      pts = pts.map((_,i) => { let x=0, y=0;
+        for (let j=-2;j<=2;j++){ x += at(i+j)[0]; y += at(i+j)[1]; }
+        return [x/5, y/5]; });
+    }
+    // Pomak prema moru (more je lijevo od smjera hoda) plus blagi valovi duž obale
+    pts = pts.map((p,i) => {
+      const a = at(i-1), b = at(i+1), dx = b[0]-a[0], dy = b[1]-a[1], len = Math.hypot(dx,dy) || 1;
+      const u = i*.25, wave = Math.sin(u*2.6+ph[0])*.6 + Math.sin(u*5.3+ph[1])*.3 + Math.sin(u*11+ph[2])*.1;
+      const o = off + amp*wave;
+      return [p[0] + dy/len*o, p[1] - dx/len*o];
+    });
+    const mid = i => { const a=at(i), b=at(i+1); return [(a[0]+b[0])/2, (a[1]+b[1])/2]; };
+    const r = v => v.map(c => +c.toFixed(3));
+    d += 'M'+r(mid(0)) + pts.map((_,i)=>'Q'+r(at(i+1))+' '+r(mid(i+1))).join('') + 'Z';
+  }
+  return d;
+}
+
+function drawCoast(L){
+  const sh = !!L.shape, W = L.w+(sh?1:0), H = L.h+(sh?1:0), b = $('board'), g = $('grid');
+  b.classList.toggle('shaped', sh);
+  b.style.aspectRatio = W + ' / ' + H;
+  b.style.setProperty('--px', sh ? 50/W+'%' : '0%');
+  b.style.setProperty('--py', sh ? 50/H+'%' : '0%');
+  g.style.clipPath = sh ? 'url(#isleClip)' : '';
+  const c = $('coast');
+  if (!sh){ c.innerHTML = ''; return; }
+  const d = coastPath(L, .08, .06);
+  c.setAttribute('viewBox', `-.5 -.5 ${W} ${H}`);
+  c.innerHTML = `<defs>
+      <clipPath id="isleClip" clipPathUnits="objectBoundingBox"><path transform="scale(${1/L.w} ${1/L.h})" d="${d}"/></clipPath>
+    </defs>
+    <path class="contour" d="${coastPath(L, .36, .05)}"/>
+    <path class="shore" d="${d}"/>`;
+}
+
+function openIsland(id){
+  isl = ISLANDS.find(I => I.id===id); LV = LEVELS[id];
+  $('map').hidden = true; $('game').hidden = false;
+  $('island').textContent = 'Otok ' + isl.name;
+  const next = LV.findIndex(L => !progress[L.id]);
+  load(next<0 ? 0 : next);
+}
+
+function load(i){
+  li = i; moves = 0; won = false;
+  const L = LV[i];
+  state = {};
+  for (const [k,v] of Object.entries(L.cells)) state[k] =
+    (v==='/'||v==='\\') ? {t:'m', v, rot: v==='/'?-45:45}
+    : v[0]==='F' ? {t:'F', c:v[1]}
+    : v[0]==='B' ? {t:'B', c:v[1]||null}
+    : {t:v};
+  $('title').textContent = 'Razina ' + (i+1);
+  $('par').textContent = L.par;
+  $('hint').textContent = L.hint;
+  $('win').hidden = true;
+  drawCoast(L);
+  const g = $('grid');
+  g.style.gridTemplateColumns = `repeat(${L.w},1fr)`;
+  g.style.gridTemplateRows = `repeat(${L.h},1fr)`;
+  $('beams').setAttribute('viewBox', `0 0 ${L.w} ${L.h}`);
+  g.innerHTML = '';
+  for (let y=0;y<L.h;y++) for (let x=0;x<L.w;x++){
+    const k = x+','+y, c = state[k];
+    let el;
+    if (!onBoard(L,x,y)){
+      el = document.createElement('div');
+      el.classList.add('off'); el.setAttribute('aria-hidden','true');
+    } else if (c && c.t==='m'){
+      el = document.createElement('button');
+      el.setAttribute('aria-label','Ogledalo, dodirni za okretanje');
+      el.innerHTML = `<div class="mirror" style="transform:rotate(${c.rot}deg)"></div>`;
+      el.onclick = () => rotate(k, el);
+    } else {
+      el = document.createElement('div');
+      if (L.light.x===x && L.light.y===y) el.innerHTML = ICONS.light(L.light.d);
+      else if (c && c.t==='#') el.innerHTML = '<div class="rock"></div>';
+      else if (c && c.t==='B'){ el.classList.add('boat'); el.innerHTML = ICONS.boat(c.c); if (c.c) el.style.setProperty('--bc', COL[c.c]); }
+      else if (c && c.t==='F') el.innerHTML = ICONS.filter(c.c);
+      else if (c && c.t==='P') el.innerHTML = ICONS.prism();
+    }
+    el.classList.add('cell'); el.dataset.k = k;
+    g.appendChild(el);
+  }
+  $('moves').textContent = 0;
+  renderDots(); trace();
+}
+
+function rotate(k, el){
+  if (won) return;
+  const c = state[k];
+  c.v = c.v==='/' ? '\\' : '/';
+  c.rot += 90;
+  el.firstChild.style.transform = `rotate(${c.rot}deg)`;
+  moves++; $('moves').textContent = moves;
+  trace();
+}
+
+function trace(){
+  const L = LV[li], segs = [], lit = new Set(), wrong = new Set(), seen = new Set();
+  const q = [{x:L.light.x, y:L.light.y, dx:L.light.d[0], dy:L.light.d[1], col:'w'}];
+  while (q.length){
+    const r = q.shift();
+    let cx=r.x, cy=r.y; const pts=[[cx+.5,cy+.5]];
+    const go = (x,y,dx,dy,col) => { const s=`${x},${y},${dx},${dy},${col}`; if (!seen.has(s)){ seen.add(s); q.push({x,y,dx,dy,col}); } };
+    while (true){
+      const nx=cx+r.dx, ny=cy+r.dy;
+      const edge = [cx+.5+r.dx*.5, cy+.5+r.dy*.5];
+      if (!onBoard(L,nx,ny)){ pts.push(edge); break; }
+      const k=nx+','+ny, c=state[k];
+      if ((nx===L.light.x&&ny===L.light.y) || (c&&c.t==='#')){ pts.push(edge); break; }
+      if (c&&c.t==='B'){ pts.push([nx+.5,ny+.5]); (!c.c || c.c===r.col ? lit : wrong).add(k); break; }
+      if (c&&c.t==='F'){ pts.push([nx+.5,ny+.5]); go(nx,ny,r.dx,r.dy,c.c); break; }
+      if (c&&(c.t==='m'||c.t==='P')){
+        pts.push([nx+.5,ny+.5]);
+        const dirs = c.t==='P' ? [[r.dy,r.dx],[-r.dy,-r.dx]]
+                   : c.v==='/' ? [[-r.dy,-r.dx]] : [[r.dy,r.dx]];
+        for (const [dx,dy] of dirs) go(nx,ny,dx,dy,r.col);
+        break;
+      }
+      cx=nx; cy=ny;
+    }
+    segs.push({pts, col:COL[r.col]});
+  }
+  $('beams').innerHTML = segs.map(({pts,col})=>{const s=pts.map(a=>a.join(',')).join(' ');return `<polyline class="glow" stroke="${col}" points="${s}"/><polyline class="core" stroke="${col}" points="${s}"/>`}).join('');
+  const boats = Object.keys(state).filter(k=>state[k].t==='B');
+  document.querySelectorAll('.boat').forEach(b=>{
+    b.classList.toggle('lit', lit.has(b.dataset.k));
+    b.classList.toggle('wrong', wrong.has(b.dataset.k) && !lit.has(b.dataset.k));
+  });
+  if (boats.every(k=>lit.has(k)) && !won){ won=true; setTimeout(showWin, 450); }
+}
+
+function showWin(){
+  const L = LV[li], wasDone = islandDone(isl.id);
+  const s = moves<=L.par ? 3 : moves<=L.par+2 ? 2 : 1;
+  saveStars(L.id, s);
+  const justLit = !wasDone && islandDone(isl.id);
+  toMap = justLit || li===LV.length-1;
+  $('winTitle').textContent = justLit ? `Otok ${isl.name} je osvijetljen` : 'Svi brodovi su u luci';
+  $('stars').innerHTML = [1,2,3].map(i=>`<span class="${i<=s?'':'off'}">★</span>`).join('');
+  $('winText').textContent = `Riješeno u ${moves} ${moves===1?'potezu':'poteza'} (cilj: ${L.par}).`;
+  $('winFact').hidden = !(justLit && isl.fact);
+  $('winFact').innerHTML = `<b>Zanimljivost</b>${isl.fact}`;
+  $('next').textContent = toMap ? 'Na kartu' : 'Sljedeća razina';
+  $('win').hidden = false;
+  renderDots();
+  $('next').focus();
+}
+
+function renderDots(){
+  $('dots').innerHTML = LV.map((L,i)=>`<button class="dot ${i===li?'cur':''} ${progress[L.id]?'done':''}" ${i>0&&!progress[LV[i-1].id]&&i!==li?'disabled':''} data-i="${i}" aria-label="Razina ${i+1}">${i+1}</button>`).join('');
+  $('dots').querySelectorAll('.dot').forEach(d=>d.onclick=()=>load(+d.dataset.i));
+}
+
+$('reset').onclick = () => load(li);
+$('next').onclick = () => toMap ? showMap() : load(li+1);
+$('back').onclick = () => showMap();
