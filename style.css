@@ -48,6 +48,18 @@ button.cell::after{content:"";position:absolute;width:22%;aspect-ratio:1;border-
 .boat.lit .sail{fill:var(--bc)}
 @media (prefers-reduced-motion:no-preference){ .boat.wrong svg{animation:rock .5s ease-in-out infinite alternate} }
 .boat.wrong::before{content:"";position:absolute;inset:14%;border-radius:50%;border:2px solid var(--bc);opacity:.6}
+/* Brod dobije svjetlo: zaljulja se. Pobjeda: brodovi uplove uz val oko sebe, zraka zasja jače */
+.board.won .beams .glow{stroke-width:.5;opacity:.5}
+@media (prefers-reduced-motion:no-preference){
+  .boat.arrive svg{animation:bob .7s ease-out}
+  .board.won .boat.lit svg{animation:sail 1.2s ease-in-out both}
+  .board.won .boat.lit::after{content:"";position:absolute;inset:18%;border-radius:50%;border:2px solid var(--bc);pointer-events:none;animation:ripple 1.1s ease-out both}
+  .board.won .beams .glow{animation:swell 1.2s ease-out both}
+}
+@keyframes bob{30%{transform:translateY(-8%) rotate(-5deg)}65%{transform:translateY(3%) rotate(3deg)}}
+@keyframes sail{25%{transform:translate(-4%,-6%) rotate(-5deg) scale(1.08)}55%{transform:translate(3%,2%) rotate(3deg) scale(1.12)}100%{transform:scale(1.1)}}
+@keyframes ripple{from{opacity:.9;transform:scale(.6)}to{opacity:0;transform:scale(1.9)}}
+@keyframes swell{from{stroke-width:.32;opacity:.33}}
 @keyframes rock{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
 .cave .mouth{transition:fill .4s}
 .cave svg{transition:filter .4s}
@@ -105,7 +117,8 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
   .intro .menu>*{animation:rise .5s 2s both}
   .intro .menu>:nth-child(2){animation-delay:2.1s}
   .intro .menu>:nth-child(3){animation-delay:2.2s}
-  .intro .progress{animation:rise .5s 2.3s both}
+  .intro .menu>:nth-child(4){animation-delay:2.3s}
+  .intro .progress{animation:rise .5s 2.4s both}
   .intro .waves{animation:fadeIn 1.2s .6s both, drift 9s 1.8s ease-in-out infinite alternate}
 }
 @keyframes lampOn{from{opacity:0;scale:.2}to{opacity:1;scale:1}}
@@ -121,6 +134,14 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .sheet h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0 0 14px}
 .sheet p{margin:0 0 10px;color:var(--muted);line-height:1.5}
 .sheet .credit{color:var(--sand);margin-bottom:16px}
+.switches{display:flex;flex-direction:column;gap:4px;margin:0 0 18px}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:.5px solid var(--line);cursor:pointer;color:var(--muted);font-size:13px;line-height:1.35}
+.switch b{display:block;color:var(--foam);font-size:15px}
+.switch input{appearance:none;flex:none;width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;margin:0;transition:background .2s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--foam);transition:translate .2s}
+.switch input:checked{background:var(--beam)}
+.switch input:checked::after{translate:18px 0;background:var(--sea)}
+.switch input:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
 .rules{list-style:none;padding:0;margin:0 0 18px;display:flex;flex-direction:column;gap:12px}
 .rules li{display:flex;gap:12px;align-items:center;line-height:1.4;color:var(--muted)}
 .rules b{color:var(--foam)}

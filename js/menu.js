@@ -29,6 +29,11 @@ for (const [c, html] of Object.entries(ruleIcons)) document.querySelector('.rule
 $('play').onclick = () => showMap();
 $('howBtn').onclick = () => $('how').showModal();
 $('aboutBtn').onclick = () => $('about').showModal();
+$('settingsBtn').onclick = () => $('settings').showModal();
+document.querySelectorAll('[data-set]').forEach(i => {
+  i.checked = Feel.settings[i.dataset.set];
+  i.onchange = () => Feel.toggle(i.dataset.set, i.checked);
+});
 $('toMenu').onclick = () => showStart(false);
 
 showStart(true);

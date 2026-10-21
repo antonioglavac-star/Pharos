@@ -29,6 +29,7 @@
     <nav class="menu">
       <button class="btn primary big" id="play">Igraj</button>
       <button class="btn" id="howBtn">Kako se igra</button>
+      <button class="btn" id="settingsBtn">Postavke</button>
       <button class="btn" id="aboutBtn">O igri</button>
     </nav>
     <p class="progress" id="startProgress"></p>
@@ -46,6 +47,16 @@
     <li><i class="r-star"></i><span>Riješi u <b>što manje poteza</b> za tri zvjezdice.</span></li>
   </ul>
   <form method="dialog"><button class="btn primary">Razumijem</button></form>
+</dialog>
+
+<dialog class="sheet" id="settings" aria-labelledby="settingsTitle">
+  <h2 id="settingsTitle">Postavke</h2>
+  <div class="switches">
+    <label class="switch"><span><b>Zvukovi</b>Ogledala, brodovi i pobjeda</span><input type="checkbox" data-set="sound"></label>
+    <label class="switch"><span><b>Šum valova</b>Tiho more u pozadini</span><input type="checkbox" data-set="waves"></label>
+    <label class="switch"><span><b>Vibracija</b>Pri dodiru i pobjedi (ne radi na iPhoneu)</span><input type="checkbox" data-set="vibrate"></label>
+  </div>
+  <form method="dialog"><button class="btn primary">Gotovo</button></form>
 </dialog>
 
 <dialog class="sheet" id="about" aria-labelledby="aboutTitle">
@@ -124,6 +135,7 @@
 <script src="js/islands.js"></script>
 <script src="js/islands/vis.js"></script>
 <script src="js/islands/bisevo.js"></script>
+<script src="js/feel.js"></script>
 <script src="js/game.js"></script>
 <script src="js/map.js"></script>
 <script src="js/menu.js"></script>

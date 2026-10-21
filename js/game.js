@@ -1,5 +1,7 @@
 const $ = id => document.getElementById(id);
 let isl, LV, li = 0, state, moves = 0, won = false, toMap = false;
+let litBefore = new Set(), quiet = true;   // koji su brodovi bili osvijetljeni prije poteza; tiho pri učitavanju razine
+const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Napredak: zvjezdice po ID-u razine (npr. 'vis-3'), pa nove razine ne kvare spremljenu igru
 const SAVE_KEY = 'svjetionik-napredak';
@@ -110,6 +112,7 @@ function load(i){
   $('par').textContent = L.par;
   $('hint').textContent = L.hint;
   $('win').hidden = true;
+  $('board').classList.remove('won');
   drawCoast(L);
   const g = $('grid');
   g.style.gridTemplateColumns = `repeat(${L.w},1fr)`;
@@ -141,7 +144,9 @@ function load(i){
   }
   $('moves').textContent = 0;
   $('legCave').hidden = !Object.values(L.cells).includes('C');
+  litBefore = new Set(); quiet = true;
   renderDots(); trace();
+  quiet = false;
 }
 
 function rotate(k, el){
@@ -151,6 +156,7 @@ function rotate(k, el){
   c.rot += 90;
   el.firstChild.style.transform = `rotate(${c.rot}deg)`;
   moves++; $('moves').textContent = moves;
+  Feel.mirror();
   trace();
 }
 
@@ -185,11 +191,21 @@ function trace(){
   $('beams').innerHTML = segs.map(({pts,col})=>{const s=pts.map(a=>a.join(',')).join(' ');return `<polyline class="glow" stroke="${col}" points="${s}"/><polyline class="core" stroke="${col}" points="${s}"/>`}).join('');
   document.querySelectorAll('.cave').forEach(c => c.classList.toggle('lit', caveLit.has(c.dataset.k)));
   const boats = Object.keys(state).filter(k=>state[k].t==='B');
+  const fresh = [...lit].filter(k => !litBefore.has(k));
+  litBefore = lit;
   document.querySelectorAll('.boat').forEach(b=>{
     b.classList.toggle('lit', lit.has(b.dataset.k));
     b.classList.toggle('wrong', wrong.has(b.dataset.k) && !lit.has(b.dataset.k));
+    // Brod koji je upravo dobio svjetlo se zaljulja
+    if (!quiet && fresh.includes(b.dataset.k)){ b.classList.remove('arrive'); void b.offsetWidth; b.classList.add('arrive'); }
   });
-  if (boats.every(k=>lit.has(k)) && !won){ won=true; setTimeout(showWin, 450); }
+  if (boats.every(k=>lit.has(k)) && !won){
+    won = true;
+    // Pobjeda: brodovi uplove, zraka zasja jače, pa se pokaže poruka
+    $('board').classList.add('won');
+    Feel.win();
+    setTimeout(showWin, calm() ? 500 : 1300);
+  } else if (!quiet && fresh.length) Feel.boat();
 }
 
 function showWin(){

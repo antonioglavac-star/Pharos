@@ -15,6 +15,7 @@ Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač rije
 ## Struktura
 
 - `index.html` – tri ekrana: početni izbornik (`#start`), karta (`#map`) i igra (`#game`), te prozori „Kako se igra” (`#how`) i „O igri” (`#about`)
+- `js/feel.js` – zvukovi (stvoreni u pregledniku, bez audio datoteka), šum valova i vibracija; postavke se pamte pod ključem `svjetionik-postavke`
 - `js/menu.js` – početni izbornik i animacija pokretanja (lampa se upali, zraka obiđe nebo i stane na natpisu; dodir je preskače; isključena uz smanjeno kretanje)
 - `style.css` – izgled (boje su tokeni u `:root`)
 - `js/islands.js` – popis otoka redom otključavanja (`ISLANDS`), boje zraka (`COL`) i prazni `LEVELS`
@@ -76,7 +77,7 @@ Oznake ćelija:
 3. Dovršiti otok Vis do 15–20 razina s postupnim rastom težine (16 razina složeno, čeka igranje i dotjerivanje)
 4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; Svetac, Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
 5. Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora) i karta s pomicanjem i zumiranjem za cijelu obalu
-6. Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija
+6. ~~Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija~~ (gotovo, uz postavke u izborniku)
 7. UX dokumentacija: persona, user flow, wireframeovi (za portfolio)
 
 ## Smjernice
