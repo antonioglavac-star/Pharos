@@ -41,8 +41,8 @@ const Feel = (() => {
     for (let i = 0; i < fade; i++){ d[i] *= i / fade; d[len - 1 - i] *= i / fade; }
     const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
     const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 450;
-    const gain = c.createGain(); gain.gain.setValueAtTime(0, c.currentTime); gain.gain.linearRampToValueAtTime(.07, c.currentTime + 3);
-    const lfo = c.createOscillator(), depth = c.createGain(); lfo.frequency.value = .11; depth.gain.value = .05;
+    const gain = c.createGain(); gain.gain.setValueAtTime(0, c.currentTime); gain.gain.linearRampToValueAtTime(.09, c.currentTime + 3);
+    const lfo = c.createOscillator(), depth = c.createGain(); lfo.frequency.value = .11; depth.gain.value = .06;
     lfo.connect(depth).connect(gain.gain);
     src.connect(lp).connect(gain).connect(master); src.start(); lfo.start();
     waves = { src, lfo, gain };
@@ -73,10 +73,10 @@ const Feel = (() => {
       if (k === 'vibrate' && v) buzz(15);
     },
     // Okretanje ogledala: kratak stakleni "klik"
-    mirror(){ if (set.sound){ tone(1300, 0, .08, .07, 'triangle', 720); tone(2600, 0, .04, .015); } buzz(8); },
+    mirror(){ if (set.sound){ tone(1300, 0, .08, .03, 'triangle', 720); tone(2600, 0, .04, .006); } buzz(8); },
     // Brod je osvijetljen: dva meka tona
-    boat(){ if (set.sound){ tone(784, 0, .55, .06); tone(1175, .07, .65, .045); } buzz(15); },
+    boat(){ if (set.sound){ tone(784, 0, .55, .025); tone(1175, .07, .65, .018); } buzz(15); },
     // Razina riješena: uzlazni zvončić
-    win(){ if (set.sound) [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .11, 1.2, .06)); buzz([20, 60, 20, 60, 40]); }
+    win(){ if (set.sound) [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .11, 1.2, .025)); buzz([20, 60, 20, 60, 40]); }
   };
 })();
