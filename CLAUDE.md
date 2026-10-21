@@ -26,6 +26,12 @@ Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač rije
 
 Nema build koraka ni ovisnosti. Igra se pokreće otvaranjem `index.html` u pregledniku.
 
+## Objava
+
+- Kod je na GitHubu: https://github.com/antonioglavac-star/Pharos (javni repozitorij, grana `main`)
+- Igra je objavljena preko GitHub Pages: https://antonioglavac-star.github.io/Pharos/
+- Svaki `git push` na `main` sam objavi novu verziju za 1–2 minute. Commit i push radi samo kad Antonio to zatraži.
+
 ## Dodavanje novog otoka
 
 1. U `js/islands.js` otok već postoji u `ISLANDS` (ili ga dodaj na pravo mjesto u redoslijedu) i upiši `fact`.
