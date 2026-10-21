@@ -33,8 +33,37 @@ function shapeErrors(L) {
   return off.length ? ['izvan obrisa: ' + off.join(' ')] : [];
 }
 
+// Magla (fog) mora imati h redova po w znakova; svjetionik i brodovi ne smiju biti u magli
+const fogCells = L => { const s = new Set(); if (L.fog) for (let y = 0; y < L.h; y++) for (let x = 0; x < L.w; x++) if (L.fog[y][x] === 'm') s.add(x + ',' + y); return s; };
+function fogErrors(L) {
+  if (!L.fog) return [];
+  if (L.fog.length !== L.h || L.fog.some(r => r.length !== L.w)) return ['magla nije veličine ' + L.w + '×' + L.h];
+  const f = fogCells(L);
+  const bad = [L.light.x + ',' + L.light.y, ...Object.keys(L.cells).filter(k => L.cells[k][0] === 'B')].filter(k => f.has(k));
+  return bad.length ? ['svjetionik ili brod u magli: ' + bad.join(' ')] : [];
+}
+
+// Može li se rješenje odigrati u magli: skriveno ogledalo smije se okrenuti tek kad ga zraka dotakne.
+// Otkrivena polja ostaju otkrivena, pa je dovoljno pohlepno okretati ono što je već vidljivo.
+function fogPlayable(L, st, mirrors, init, mask) {
+  const f = fogCells(L);
+  if (!f.size) return true;
+  mirrors.forEach((k, i) => st[k].v = init[i]);
+  const seen = new Set(litBoats(L, st).touched);
+  let left = mirrors.filter((k, i) => mask >> i & 1);
+  while (left.length) {
+    const k = left.find(k => !f.has(k) || seen.has(k));
+    if (!k) return false;
+    st[k].v = st[k].v === '/' ? '\\' : '/';
+    left = left.filter(x => x !== k);
+    for (const t of litBoats(L, st).touched) seen.add(t);
+  }
+  return true;
+}
+
 function litBoats(L, st) {
-  const lit = new Set(), seen = new Set();
+  const lit = new Set(), seen = new Set(), touched = new Set();
+  lit.touched = touched;
   const q = [{ x: L.light.x, y: L.light.y, dx: L.light.d[0], dy: L.light.d[1], col: 'w' }];
   while (q.length) {
     const r = q.shift();
@@ -44,6 +73,7 @@ function litBoats(L, st) {
       const nx = cx + r.dx, ny = cy + r.dy;
       if (!onBoard(L, nx, ny)) break;
       const k = nx + ',' + ny, c = st[k];
+      touched.add(k);
       if ((nx === L.light.x && ny === L.light.y) || (c && c.t === '#')) break;
       if (c && c.t === 'B') { if (!c.c || c.c === r.col) lit.add(k); break; }
       if (c && c.t === 'F') { go(nx, ny, r.dx, r.dy, c.c); break; }
@@ -66,12 +96,13 @@ for (const [island, list] of Object.entries(LEVELS)) {
   for (const L of list) {
   if (ids.has(L.id)) { console.log(`${L.id}: ID se ponavlja`); ok = false; }
   ids.add(L.id);
-  for (const e of shapeErrors(L)) { console.log(`${L.id}: ${e}`); ok = false; }
+  for (const e of [...shapeErrors(L), ...fogErrors(L)]) { console.log(`${L.id}: ${e}`); ok = false; }
   const st = parse(L);
   const mirrors = Object.keys(st).filter(k => st[k].t === 'm');
   const init = mirrors.map(k => st[k].v);
   const boats = Object.keys(st).filter(k => st[k].t === 'B');
   let best = Infinity, solvedAtStart = false;
+  const solutions = [];
   for (let m = 0; m < 1 << mirrors.length; m++) {
     mirrors.forEach((k, i) => st[k].v = (m >> i & 1) ? (init[i] === '/' ? '\\' : '/') : init[i]);
     const lit = litBoats(L, st);
@@ -79,11 +110,13 @@ for (const [island, list] of Object.entries(LEVELS)) {
       let n = 0; for (let x = m; x; x >>= 1) n += x & 1;
       if (n === 0) solvedAtStart = true;
       best = Math.min(best, n);
+      solutions.push([m, n]);
     }
   }
   let status = 'OK';
   if (best === Infinity) { status = 'NERJEŠIVA'; ok = false; }
   else if (solvedAtStart) { status = 'RIJEŠENA NA STARTU'; ok = false; }
+  else if (!solutions.some(([m, n]) => n === best && fogPlayable(L, st, mirrors, init, m))) { status = 'magla skriva ogledalo koje treba okrenuti'; ok = false; }
   else if (best !== L.par) { status = `par bi trebao biti ${best}`; ok = false; }
   console.log(`${L.id}: min ${best === Infinity ? '-' : best}, par ${L.par} -> ${status}`);
   }

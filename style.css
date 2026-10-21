@@ -61,6 +61,15 @@ button.cell::after{content:"";position:absolute;width:22%;aspect-ratio:1;border-
 @keyframes ripple{from{opacity:.9;transform:scale(.6)}to{opacity:0;transform:scale(1.9)}}
 @keyframes swell{from{stroke-width:.32;opacity:.33}}
 @keyframes rock{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+/* Magla: mekani oblaci preko polja; nestanu kad ih zraka dotakne */
+.fog .mist{position:absolute;inset:-1px;pointer-events:none;transition:opacity .8s ease;
+  background:radial-gradient(60% 45% at 30% 35%,#c9d4e3b3,#c9d4e300 70%),radial-gradient(55% 50% at 72% 62%,#a9bbd1a6,#a9bbd100 70%),#8ea3bf59;
+  -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.fog.clear .mist{opacity:0}
+button.cell:disabled{cursor:default}
+button.cell:disabled::after{display:none}
+@media (prefers-reduced-motion:no-preference){ .fog:not(.clear) .mist{animation:mist 7s ease-in-out infinite alternate} }
+@keyframes mist{to{background-position:12% 8%,-10% -6%,0 0}}
 .cave .mouth{transition:fill .4s}
 .cave svg{transition:filter .4s}
 .cave.lit .mouth{fill:#2f8fe0}
@@ -147,6 +156,7 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .rules b{color:var(--foam)}
 .rules i{flex:none;width:36px;height:36px;border-radius:8px;background:var(--cell);border:.5px solid var(--line);display:grid;place-items:center;font-style:normal;color:var(--beam);font-size:18px}
 .rules i .icon{width:84%;height:84%}
+.rules i .fog-chip{width:100%;height:100%;border-radius:8px;background:radial-gradient(60% 45% at 30% 35%,#c9d4e3b3,#c9d4e300 70%),radial-gradient(55% 50% at 72% 62%,#a9bbd1a6,#a9bbd100 70%),#8ea3bf59}
 .rules i .mirror{width:80%;height:13%}
 .titlebar{display:flex;align-items:flex-end;gap:10px}
 .back{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--foam);font-size:18px;cursor:pointer;flex:none}

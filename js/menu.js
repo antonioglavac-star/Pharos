@@ -22,7 +22,7 @@ $('start').addEventListener('click', e => {
 const ruleIcons = {
   'r-mirror': '<div class="mirror" style="transform:rotate(-45deg)"></div>',
   'r-boat': ICONS.boat(), 'r-prism': ICONS.prism(), 'r-filter': ICONS.filter('r'),
-  'r-cave': ICONS.cave(), 'r-star': '★'
+  'r-cave': ICONS.cave(), 'r-fog': '<span class="fog-chip"></span>', 'r-star': '★'
 };
 for (const [c, html] of Object.entries(ruleIcons)) document.querySelector('.rules .' + c).innerHTML = html;
 

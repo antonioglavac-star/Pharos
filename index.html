@@ -44,6 +44,7 @@
     <li><i class="r-prism"></i><span><b>Prizma</b> dijeli zraku na dvije strane.</span></li>
     <li><i class="r-filter"></i><span><b>Filter</b> boji zraku. Obojeni brod prima samo svoju boju.</span></li>
     <li><i class="r-cave"></i><span><b>Modra špilja</b> propušta samo plavo svjetlo.</span></li>
+    <li><i class="r-fog"></i><span><b>Magla</b> skriva polja dok zraka ne prođe kroz njih.</span></li>
     <li><i class="r-star"></i><span>Riješi u <b>što manje poteza</b> za tri zvjezdice.</span></li>
   </ul>
   <form method="dialog"><button class="btn primary">Razumijem</button></form>
@@ -127,6 +128,7 @@
       <span><i style="background:#c9d4e3"></i>Ogledalo – dodirni za okretanje</span>
       <span><i style="background:#7fd4ff"></i>Prizma – dijeli zraku</span>
       <span><i style="background:linear-gradient(90deg,#ff6b5e 50%,#4fb6ff 50%)"></i>Filter – boji zraku; brod prima samo svoju boju</span>
+      <span id="legFog" hidden><i style="background:#a9bbd1"></i>Magla – zraka otkriva što je ispod</span>
       <span id="legCave" hidden><i style="background:#2f8fe0"></i>Modra špilja – propušta samo plavo svjetlo</span>
     </div>
   </section>
@@ -135,6 +137,7 @@
 <script src="js/islands.js"></script>
 <script src="js/islands/vis.js"></script>
 <script src="js/islands/bisevo.js"></script>
+<script src="js/islands/svetac.js"></script>
 <script src="js/feel.js"></script>
 <script src="js/game.js"></script>
 <script src="js/map.js"></script>

@@ -1,5 +1,6 @@
 const $ = id => document.getElementById(id);
 let isl, LV, li = 0, state, moves = 0, won = false, toMap = false;
+let fog = new Set();   // polja pod maglom koja zraka još nije dotaknula
 let litBefore = new Set(), quiet = true;   // koji su brodovi bili osvijetljeni prije poteza; tiho pri učitavanju razine
 const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -119,6 +120,8 @@ function load(i){
   g.style.gridTemplateRows = `repeat(${L.h},1fr)`;
   $('beams').setAttribute('viewBox', `0 0 ${L.w} ${L.h}`);
   g.innerHTML = '';
+  fog = new Set();
+  if (L.fog) for (let y=0;y<L.h;y++) for (let x=0;x<L.w;x++) if (L.fog[y][x]==='m') fog.add(x+','+y);
   for (let y=0;y<L.h;y++) for (let x=0;x<L.w;x++){
     const k = x+','+y, c = state[k];
     let el;
@@ -140,10 +143,16 @@ function load(i){
       else if (c && c.t==='C'){ el.classList.add('cave'); el.innerHTML = ICONS.cave(); }
     }
     el.classList.add('cell'); el.dataset.k = k;
+    // Magla skriva polje dok zraka ne prođe kroz njega; skriveno ogledalo se ne može okretati
+    if (fog.has(k)){
+      el.classList.add('fog'); el.insertAdjacentHTML('beforeend', '<div class="mist"></div>');
+      if (el.tagName==='BUTTON'){ el.disabled = true; el.setAttribute('aria-label','Skriveno u magli'); }
+    }
     g.appendChild(el);
   }
   $('moves').textContent = 0;
   $('legCave').hidden = !Object.values(L.cells).includes('C');
+  $('legFog').hidden = !L.fog;
   litBefore = new Set(); quiet = true;
   renderDots(); trace();
   quiet = false;
@@ -161,7 +170,7 @@ function rotate(k, el){
 }
 
 function trace(){
-  const L = LV[li], segs = [], lit = new Set(), wrong = new Set(), seen = new Set(), caveLit = new Set();
+  const L = LV[li], segs = [], lit = new Set(), wrong = new Set(), seen = new Set(), caveLit = new Set(), touched = new Set();
   const q = [{x:L.light.x, y:L.light.y, dx:L.light.d[0], dy:L.light.d[1], col:'w'}];
   while (q.length){
     const r = q.shift();
@@ -172,6 +181,7 @@ function trace(){
       const edge = [cx+.5+r.dx*.5, cy+.5+r.dy*.5];
       if (!onBoard(L,nx,ny)){ pts.push(edge); break; }
       const k=nx+','+ny, c=state[k];
+      touched.add(k);
       if ((nx===L.light.x&&ny===L.light.y) || (c&&c.t==='#')){ pts.push(edge); break; }
       if (c&&c.t==='B'){ pts.push([nx+.5,ny+.5]); (!c.c || c.c===r.col ? lit : wrong).add(k); break; }
       if (c&&c.t==='F'){ pts.push([nx+.5,ny+.5]); go(nx,ny,r.dx,r.dy,c.c); break; }
@@ -190,6 +200,13 @@ function trace(){
   }
   $('beams').innerHTML = segs.map(({pts,col})=>{const s=pts.map(a=>a.join(',')).join(' ');return `<polyline class="glow" stroke="${col}" points="${s}"/><polyline class="core" stroke="${col}" points="${s}"/>`}).join('');
   document.querySelectorAll('.cave').forEach(c => c.classList.toggle('lit', caveLit.has(c.dataset.k)));
+  // Zraka raspršuje maglu: polje ostaje otkriveno do kraja pokušaja
+  for (const k of touched) if (fog.has(k)){
+    fog.delete(k);
+    const el = document.querySelector(`#grid [data-k="${k}"]`);
+    el.classList.add('clear');
+    if (el.tagName==='BUTTON'){ el.disabled = false; el.setAttribute('aria-label','Ogledalo, dodirni za okretanje'); }
+  }
   const boats = Object.keys(state).filter(k=>state[k].t==='B');
   const fresh = [...lit].filter(k => !litBefore.has(k));
   litBefore = lit;

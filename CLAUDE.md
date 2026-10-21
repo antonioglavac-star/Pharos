@@ -60,6 +60,8 @@ shape:['..xxx.',
        'xxxxxx', … ]
 ```
 
+Neobavezno polje `fog` (od Sveca) prekriva polja maglom: isti oblik kao `shape`, `'m'` je magla, `'.'` je vidljivo. Polje pod maglom otkrije se kad zraka uđe u njega i ostaje otkriveno do kraja pokušaja; skriveno ogledalo ne može se okretati. Svjetionik i brodovi ne smiju biti u magli. Alat provjerava i da se najkraće rješenje može odigrati redom otkrivanja.
+
 Oznake ćelija:
 - `/` i `\` – ogledalo (igrač ga okreće dodirom)
 - `#` – stijena (blokira zraku)
@@ -75,7 +77,7 @@ Oznake ćelija:
 1. ~~Filteri boja~~ (gotovo)
 2. ~~Otoci kao zasebne datoteke, spremanje napretka, probna karta~~ (gotovo)
 3. Dovršiti otok Vis do 15–20 razina s postupnim rastom težine (16 razina složeno, čeka igranje i dotjerivanje)
-4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; Svetac, Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
+4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; ~~Svetac~~ – 12 razina, magla; Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
 5. Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora) i karta s pomicanjem i zumiranjem za cijelu obalu
 6. ~~Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija~~ (gotovo, uz postavke u izborniku)
 7. UX dokumentacija: persona, user flow, wireframeovi (za portfolio)
