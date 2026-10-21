@@ -47,6 +47,7 @@ function litBoats(L, st) {
       if ((nx === L.light.x && ny === L.light.y) || (c && c.t === '#')) break;
       if (c && c.t === 'B') { if (!c.c || c.c === r.col) lit.add(k); break; }
       if (c && c.t === 'F') { go(nx, ny, r.dx, r.dy, c.c); break; }
+      if (c && c.t === 'C') { if (r.col === 'b') { cx = nx; cy = ny; continue; } break; }
       if (c && (c.t === 'm' || c.t === 'P')) {
         const d = c.t === 'P' ? [[r.dy, r.dx], [-r.dy, -r.dx]] : c.v === '/' ? [[-r.dy, -r.dx]] : [[r.dy, r.dx]];
         for (const [a, b] of d) go(nx, ny, a, b, r.col);

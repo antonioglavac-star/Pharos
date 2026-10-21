@@ -49,6 +49,10 @@ button.cell::after{content:"";position:absolute;width:22%;aspect-ratio:1;border-
 @media (prefers-reduced-motion:no-preference){ .boat.wrong svg{animation:rock .5s ease-in-out infinite alternate} }
 .boat.wrong::before{content:"";position:absolute;inset:14%;border-radius:50%;border:2px solid var(--bc);opacity:.6}
 @keyframes rock{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+.cave .mouth{transition:fill .4s}
+.cave svg{transition:filter .4s}
+.cave.lit .mouth{fill:#2f8fe0}
+.cave.lit svg{filter:drop-shadow(0 0 6px #4fb6ff)}
 svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*var(--px,0%));height:calc(100% - 2*var(--py,0%));pointer-events:none;overflow:visible}
 .beams polyline{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .glow{stroke-width:.32;opacity:.33}

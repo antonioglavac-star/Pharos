@@ -21,6 +21,7 @@ Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač rije
 - `js/game.js` – logika igre: crtanje mreže, okretanje ogledala, praćenje zrake, pobjeda, spremanje napretka
 - `js/map.js` – karta otoka i kartica odabranog otoka
 - `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.png` (prozirna pozadina) i `icon-*.png` su pripremljene verzije za igru
+- `docs/testiranje.md` – bilješke s testiranja s igračima (za portfolio)
 - `manifest.webmanifest` – ime i ikona kad se igra doda na početni zaslon mobitela
 - `tools/check-levels.js` – provjerava da je svaka razina rješiva, da je `par` točan i da se ID-jevi ne ponavljaju
 
@@ -63,6 +64,7 @@ Oznake ćelija:
 - `P` – prizma (dijeli zraku na dvije, okomito na smjer dolaska)
 - `Fr`, `Fb` – filter (boji zraku u crveno / plavo)
 - `B` – brod (prima bilo koje svjetlo), `Br`, `Bb` – obojeni brod (samo svoja boja)
+- `C` – Modra špilja (od Biševa): plava zraka prolazi ravno kroz nju i špilja zasvijetli, svaka druga zraka staje na ulazu
 
 `par` je najmanji broj poteza. Nakon svake izmjene razina obavezno pokreni `node tools/check-levels.js` i ispravi `par` ako ne odgovara. Razina ne smije biti riješena na startu.
 
@@ -71,7 +73,7 @@ Oznake ćelija:
 1. ~~Filteri boja~~ (gotovo)
 2. ~~Otoci kao zasebne datoteke, spremanje napretka, probna karta~~ (gotovo)
 3. Dovršiti otok Vis do 15–20 razina s postupnim rastom težine (16 razina složeno, čeka igranje i dotjerivanje)
-4. Novi otoci jedan po jedan (Biševo, Svetac, Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
+4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; Svetac, Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
 5. Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora) i karta s pomicanjem i zumiranjem za cijelu obalu
 6. Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija
 7. UX dokumentacija: persona, user flow, wireframeovi (za portfolio)

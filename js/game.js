@@ -20,6 +20,7 @@ const ICONS = {
      <rect x="15.5" y="9" width="9" height="5" rx="1" fill="#ffc35a"/><path d="M14.5 9h11l-5.5-4z" fill="#d9534f"/></g></svg>`,
   filter: c => `<svg class="icon" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="7" fill="${COL[c]}" fill-opacity=".38" stroke="${COL[c]}" stroke-width="2.5"/><path d="M14 15l6-3" stroke="#fff9" stroke-width="2" stroke-linecap="round"/></svg>`,
   boat: c => `<svg class="icon" viewBox="0 0 40 40"><path d="M7 25h26l-4 7H11z" fill="#c9d4e3"/><path class="sail" d="M20 6v17H10z" fill="${c?COL[c]:'#e9eff7'}"/><path d="M21 9v14h8z" fill="#8ea3bf"/><path d="M5 34c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 6 2" stroke="#8ea3bf55" stroke-width="1.5" fill="none"/></svg>`,
+  cave: () => `<svg class="icon" viewBox="0 0 40 40"><path d="M4 34C4 17 10 7 20 7s16 10 16 27z" fill="#34404f"/><path d="M9 30C10 19 14 12 20 11" stroke="#4a5768" stroke-width="2" fill="none" stroke-linecap="round"/><path class="mouth" d="M12 34c0-9 3.5-15 8-15s8 6 8 15z" fill="#07101d"/></svg>`,
   prism: () => `<svg class="icon" viewBox="0 0 40 40"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bfe9ff"/><stop offset="1" stop-color="#5aa7ff"/></linearGradient></defs><path d="M20 7l13 23H7z" fill="url(#pg)" opacity=".9"/><path d="M20 7l-4 23" stroke="#fff8" stroke-width="1"/></svg>`
 };
 
@@ -133,11 +134,13 @@ function load(i){
       else if (c && c.t==='B'){ el.classList.add('boat'); el.innerHTML = ICONS.boat(c.c); if (c.c) el.style.setProperty('--bc', COL[c.c]); }
       else if (c && c.t==='F') el.innerHTML = ICONS.filter(c.c);
       else if (c && c.t==='P') el.innerHTML = ICONS.prism();
+      else if (c && c.t==='C'){ el.classList.add('cave'); el.innerHTML = ICONS.cave(); }
     }
     el.classList.add('cell'); el.dataset.k = k;
     g.appendChild(el);
   }
   $('moves').textContent = 0;
+  $('legCave').hidden = !Object.values(L.cells).includes('C');
   renderDots(); trace();
 }
 
@@ -152,7 +155,7 @@ function rotate(k, el){
 }
 
 function trace(){
-  const L = LV[li], segs = [], lit = new Set(), wrong = new Set(), seen = new Set();
+  const L = LV[li], segs = [], lit = new Set(), wrong = new Set(), seen = new Set(), caveLit = new Set();
   const q = [{x:L.light.x, y:L.light.y, dx:L.light.d[0], dy:L.light.d[1], col:'w'}];
   while (q.length){
     const r = q.shift();
@@ -166,6 +169,8 @@ function trace(){
       if ((nx===L.light.x&&ny===L.light.y) || (c&&c.t==='#')){ pts.push(edge); break; }
       if (c&&c.t==='B'){ pts.push([nx+.5,ny+.5]); (!c.c || c.c===r.col ? lit : wrong).add(k); break; }
       if (c&&c.t==='F'){ pts.push([nx+.5,ny+.5]); go(nx,ny,r.dx,r.dy,c.c); break; }
+      // Modra špilja: plava zraka prolazi kroz nju, svaka druga staje na ulazu
+      if (c&&c.t==='C'){ if (r.col==='b'){ caveLit.add(k); cx=nx; cy=ny; continue; } pts.push(edge); break; }
       if (c&&(c.t==='m'||c.t==='P')){
         pts.push([nx+.5,ny+.5]);
         const dirs = c.t==='P' ? [[r.dy,r.dx],[-r.dy,-r.dx]]
@@ -178,6 +183,7 @@ function trace(){
     segs.push({pts, col:COL[r.col]});
   }
   $('beams').innerHTML = segs.map(({pts,col})=>{const s=pts.map(a=>a.join(',')).join(' ');return `<polyline class="glow" stroke="${col}" points="${s}"/><polyline class="core" stroke="${col}" points="${s}"/>`}).join('');
+  document.querySelectorAll('.cave').forEach(c => c.classList.toggle('lit', caveLit.has(c.dataset.k)));
   const boats = Object.keys(state).filter(k=>state[k].t==='B');
   document.querySelectorAll('.boat').forEach(b=>{
     b.classList.toggle('lit', lit.has(b.dataset.k));
