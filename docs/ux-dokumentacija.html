@@ -1,0 +1,425 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pharos UX dokumentacija</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Izgled: noćna pomorska karta kao u igri. Jedna tamna tema namjerno; tanke linije boje pijeska, jedina topla boja je svjetlo. */
+:root{
+  --sea:#0a1729; --sea-2:#0f223a; --panel:#122843; --line:#1d3656;
+  --foam:#e9eff7; --muted:#9fb2cb; --sand:#e6d6b0; --sand-dim:#e6d6b066;
+  --beam:#ffc35a; --beam-soft:#ffc35a26; --red:#ff6b5e; --blue:#4fb6ff;
+  --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--sea)}
+body{background:radial-gradient(120% 40% at 50% 0%,var(--sea-2),var(--sea) 70%);background-color:var(--sea);color:var(--foam);font:16px/1.6 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px}
+.page{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:72px}
+h1,h2,h3{font-family:var(--display);font-weight:800;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(40px,8vw,72px);letter-spacing:-.01em}
+h2{font-size:clamp(26px,4vw,34px)}
+h3{font-size:19px;font-weight:600}
+p{margin:0}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--sand)}
+.lede{font-size:19px;color:var(--muted);max-width:62ch}
+.prose{max-width:66ch;color:var(--muted)}
+.prose b,.lede b{color:var(--foam)}
+a{color:var(--beam)}
+a:focus-visible{outline:2px solid var(--beam);outline-offset:3px;border-radius:2px}
+section{display:flex;flex-direction:column;gap:22px}
+.head{display:flex;flex-direction:column;gap:8px}
+
+/* Uvod */
+.hero{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:40px;align-items:end}
+.hero-text{display:flex;flex-direction:column;gap:18px;min-width:0}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:14px;border-top:1px solid var(--line);padding-top:18px}
+.facts dt{color:var(--sand)}
+.facts dd{margin:0;color:var(--muted)}
+.stat-row{display:flex;flex-wrap:wrap;gap:28px;font-variant-numeric:tabular-nums}
+.stat b{display:block;font-family:var(--display);font-size:34px;line-height:1;color:var(--beam)}
+.stat span{font-size:13px;color:var(--muted)}
+.hero-art svg{width:100%;height:auto;display:block}
+
+/* Persone */
+.personas{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px}
+.persona{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.persona header{display:flex;gap:16px;align-items:center}
+.avatar{flex:none;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;color:var(--sea);background:var(--sand)}
+.persona.alt .avatar{background:var(--blue)}
+.tag{display:inline-block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px solid var(--sand-dim);color:var(--sand)}
+.persona .who{color:var(--muted);font-size:14px}
+.quote{font-style:italic;color:var(--sand);border-left:2px solid var(--beam);padding-left:14px}
+.persona dl{display:grid;gap:12px;margin:0}
+.persona dt{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--sand)}
+.persona dd{margin:2px 0 0;color:var(--muted);font-size:15px}
+.persona dd b{color:var(--foam)}
+.note{font-size:14px;color:var(--muted);border:1px dashed var(--sand-dim);border-radius:12px;padding:12px 16px;max-width:72ch}
+
+/* Tok */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--sea-2)}
+.scroll svg{display:block;min-width:780px;width:100%;height:auto}
+.flow text{font-family:var(--body);font-size:13px;fill:var(--foam);text-anchor:middle}
+.flow .node{fill:var(--panel);stroke:var(--sand);stroke-width:1}
+.flow .dialog{fill:var(--sea);stroke:var(--sand-dim);stroke-width:1;stroke-dasharray:4 3}
+.flow .dec{fill:var(--sea);stroke:var(--beam);stroke-width:1.2}
+.flow .hl{fill:var(--beam-soft);stroke:var(--beam);stroke-width:1.2}
+.flow .edge{fill:none;stroke:var(--sand-dim);stroke-width:1.2}
+.flow .edge.dash{stroke-dasharray:4 4}
+.flow .lbl{font-size:11px;fill:var(--sand);letter-spacing:.04em}
+.flow .small{font-size:12px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:18px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+
+/* Wireframeovi */
+.wires{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:24px}
+.wire{display:flex;flex-direction:column;gap:10px;min-width:0}
+.wire svg{width:100%;max-width:220px;height:auto;display:block;margin:0 auto}
+.wire h3{font-size:16px}
+.wire p{font-size:14px;color:var(--muted)}
+.wf .frame{fill:var(--sea-2);stroke:var(--sand-dim);stroke-width:1.2}
+.wf .ln{fill:none;stroke:var(--sand);stroke-width:1}
+.wf .dim{fill:none;stroke:var(--sand-dim);stroke-width:1}
+.wf .blk{fill:var(--line)}
+.wf .txt{fill:var(--muted)}
+.wf .beam{stroke:var(--beam);stroke-width:2.2;fill:none;stroke-linecap:round}
+.wf .btn{fill:var(--beam)}
+.wf .btn2{fill:none;stroke:var(--sand-dim);stroke-width:1}
+.wf .land{fill:var(--panel);stroke:var(--sand);stroke-width:1}
+.wf .sel{fill:none;stroke:var(--beam);stroke-width:1.2}
+.wf .fog{fill:#a9bbd1;opacity:.45}
+.wf text{font-family:var(--body);fill:var(--foam);font-size:9px}
+.wf .t{font-family:var(--display);font-weight:800;font-size:13px}
+
+/* Odluke */
+.decisions{display:grid;gap:0;border-top:1px solid var(--line)}
+.decision{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1.2fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
+.decision h3{font-size:17px}
+.decision p{color:var(--muted);font-size:15px}
+.decision .res{color:var(--sand)}
+.colhead{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr) minmax(0,1.2fr);gap:20px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--sand);padding-bottom:10px}
+
+/* Testiranje */
+.test{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.box ul,.box ol{margin:0;padding-left:20px;color:var(--muted);display:grid;gap:8px}
+.box li::marker{color:var(--beam)}
+.box.wide{grid-column:1/-1}
+.mech{display:flex;flex-wrap:wrap;gap:10px}
+.mech span{font-size:14px;padding:6px 12px;border-radius:999px;background:var(--sea);border:1px solid var(--line);color:var(--muted)}
+.mech span b{color:var(--foam);font-weight:700}
+
+footer{border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between}
+
+@media (max-width:720px){
+  .hero{grid-template-columns:1fr}
+  .hero-art{max-width:320px}
+  .decision,.colhead{grid-template-columns:1fr;gap:6px}
+  .colhead{display:none}
+  .test{grid-template-columns:1fr}
+}
+</style>
+
+<main class="page">
+
+  <!-- Uvod -->
+  <header class="hero">
+    <div class="hero-text">
+      <span class="eyebrow">UX studija slučaja · mobilna logička igra</span>
+      <h1>Pharos</h1>
+      <p class="lede">Opuštajuća logička igra u kojoj igrač kao <b>čuvar svjetionika</b> okreće ogledala i vodi zraku svjetla do brodova. Otok po otok pali svjetla duž Jadrana, u kratkim sesijama od jedne do tri minute, bez tajmera i bez pritiska.</p>
+      <div class="stat-row">
+        <div class="stat"><b>40</b><span>razina</span></div>
+        <div class="stat"><b>3</b><span>otoka igriva</span></div>
+        <div class="stat"><b>5</b><span>mehanika</span></div>
+        <div class="stat"><b>1–3</b><span>minute po sesiji</span></div>
+      </div>
+      <dl class="facts">
+        <dt>Uloga</dt><dd>Ideja, UX i vizualni dizajn, testiranje s igračima</dd>
+        <dt>Platforma</dt><dd>Mobilni web, dodaje se na početni zaslon kao aplikacija</dd>
+        <dt>Igra</dt><dd><a href="https://antonioglavac-star.github.io/Pharos/">antonioglavac-star.github.io/Pharos</a></dd>
+        <dt>Godina</dt><dd>2026.</dd>
+      </dl>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <!-- Mala ploča razine: otok s mrežom, svjetionik i zraka do broda -->
+      <svg viewBox="0 0 260 260">
+        <path d="M40 60C58 30 120 26 170 34s70 30 64 74c-5 36 10 60-8 92s-70 34-118 28S26 206 24 160s-2-74 16-100z" fill="#122843" stroke="#e6d6b0" stroke-width="1.2"/>
+        <path d="M30 66C50 22 120 16 172 24s80 34 72 82c-5 36 12 64-8 98s-76 40-126 32S14 214 14 160s0-78 16-94z" fill="none" stroke="#e6d6b066" stroke-dasharray="3 4"/>
+        <g stroke="#1d3656" stroke-width="1">
+          <path d="M56 40V236M92 32V240M128 30V240M164 32V240M200 40V230"/>
+          <path d="M28 74H236M24 110H240M24 146H244M24 182H240M30 218H230"/>
+        </g>
+        <path d="M74 200V92H182V164" fill="none" stroke="#ffc35a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity=".25"/>
+        <path d="M74 200V92H182V164" fill="none" stroke="#ffc35a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="64" y="196" width="20" height="26" rx="3" fill="#e9eff7"/><rect x="64" y="204" width="20" height="6" fill="#d9534f"/><rect x="66" y="190" width="16" height="7" rx="2" fill="#ffc35a"/>
+        <path d="M66 84l16 16M174 84l16 16" stroke="#e9eff7" stroke-width="4" stroke-linecap="round"/>
+        <path d="M168 176h30l-5 9h-20z" fill="#c9d4e3"/><path d="M182 150v24h-14z" fill="#ffc35a"/>
+        <ellipse cx="128" cy="150" rx="13" ry="11" fill="#34404f"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- Problem -->
+  <section>
+    <div class="head"><span class="eyebrow">Polazište</span><h2>Problem i cilj</h2></div>
+    <p class="prose">Mobilne logičke igre za kratke pauze često igrača drže pod pritiskom: tajmeri, ograničeni životi, reklame između razina i kupnje u igri. Cilj je bio napraviti igru koja <b>smiruje</b>, a ipak daje osjećaj napretka i malog uspjeha nakon svake razine. Tema hrvatskih otoka i svjetionika daje igri prepoznatljiv identitet: svaki osvijetljeni otok otkrije kratku zanimljivost o mjestu, a karta se postupno puni svjetlom.</p>
+  </section>
+
+  <!-- Persone -->
+  <section>
+    <div class="head"><span class="eyebrow">Za koga</span><h2>Persone</h2></div>
+    <div class="personas">
+      <article class="persona">
+        <header>
+          <div class="avatar">I</div>
+          <div><span class="tag">Primarna · ciljana publika</span><h3>Ivana, 34</h3><p class="who">Medicinska sestra iz Splita, igra na mobitelu u pauzama i u autobusu</p></div>
+        </header>
+        <p class="quote">„Želim nešto za pet minuta što me smiri, a ne tjera me da kupujem ili žurim.”</p>
+        <dl>
+          <div><dt>Ciljevi</dt><dd>Opustiti se nakon smjene. Osjećaj da nešto napreduje, bez obveze da igra svaki dan.</dd></div>
+          <div><dt>Frustracije</dt><dd>Reklame, tajmeri i gubljenje života. Dugi tutorijali i puno teksta.</dd></div>
+          <div><dt>Kako joj Pharos odgovara</dt><dd><b>Razine od 1–3 minute</b>, bez tajmera. Napredak se pamti sam. Poznati otoci i <b>zanimljivost</b> kao nagrada. Mirni zvukovi valova koje može isključiti.</dd></div>
+        </dl>
+      </article>
+      <article class="persona alt">
+        <header>
+          <div class="avatar">M</div>
+          <div><span class="tag">Sekundarna · prema testu</span><h3>Marko, 27</h3><p class="who">Student, redovito igra logičke i puzzle igre</p></div>
+        </header>
+        <p class="quote">„Prva razina mi je jasna za pet sekundi. Daj mi nešto novo što me natjera da stanem i razmislim.”</p>
+        <dl>
+          <div><dt>Ciljevi</dt><dd>Izazov i optimalno rješenje. Skupiti sve zvjezdice.</dd></div>
+          <div><dt>Frustracije</dt><dd>Prelagane razine i ponavljanje iste ideje.</dd></div>
+          <div><dt>Kako mu Pharos odgovara</dt><dd><b>Tri zvjezdice</b> samo za najmanji broj poteza. Svaki novi otok donosi <b>novu mehaniku</b>, a težina od Biševa raste brže.</dd></div>
+        </dl>
+      </article>
+    </div>
+    <p class="note">Ivana je proto-persona, sastavljena prema pretpostavkama o ciljanoj publici. Istraživanjem je tek treba potvrditi. Marko je sastavljen prema prvom testu s troje iskusnih igrača.</p>
+  </section>
+
+  <!-- Korisnički tok -->
+  <section>
+    <div class="head"><span class="eyebrow">Kako se kreće kroz igru</span><h2>Korisnički tok</h2></div>
+    <p class="prose">Igra ima tri glavna ekrana: <b>početni izbornik</b>, <b>kartu otoka</b> i <b>razinu</b>. Petlja koja se ponavlja je kratka: okreni ogledalo, pogledaj kamo ide zraka, ponovi dok svi brodovi nisu u luci.</p>
+    <div class="scroll">
+      <svg class="flow" viewBox="0 0 980 620" role="img" aria-labelledby="flowTitle">
+        <title id="flowTitle">Korisnički tok igre Pharos od pokretanja do osvijetljenog otoka</title>
+        <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#e6d6b0" opacity=".8"/></marker></defs>
+
+        <!-- Red 1: pokretanje i izbornik -->
+        <rect class="node" x="20" y="30" width="160" height="48" rx="10"/><text x="100" y="59">Pokretanje igre</text>
+        <rect class="node" x="230" y="30" width="160" height="48" rx="10"/><text x="310" y="52">Animacija</text><text x="310" y="68">svjetionika</text>
+        <text class="lbl" x="310" y="96">dodir je preskače</text>
+        <rect class="hl" x="440" y="30" width="160" height="48" rx="10"/><text x="520" y="59">Početni izbornik</text>
+        <path class="edge" d="M180 54H226" marker-end="url(#ar)"/>
+        <path class="edge" d="M390 54H436" marker-end="url(#ar)"/>
+        <rect class="dialog" x="690" y="8" width="150" height="30" rx="8"/><text class="small" x="765" y="28">Kako se igra</text>
+        <rect class="dialog" x="690" y="44" width="150" height="30" rx="8"/><text class="small" x="765" y="64">Postavke</text>
+        <rect class="dialog" x="690" y="80" width="150" height="30" rx="8"/><text class="small" x="765" y="100">O igri</text>
+        <path class="edge dash" d="M600 54H650M650 23V95M650 23H686M650 59H686M650 95H686" />
+        <text class="lbl" x="905" y="59">prozor se</text><text class="lbl" x="905" y="73">zatvara</text>
+
+        <!-- Red 2: karta -->
+        <path class="edge" d="M520 78V172" marker-end="url(#ar)"/>
+        <text class="lbl" x="530" y="130" style="text-anchor:start">Igraj / Nastavi</text>
+        <rect class="hl" x="440" y="176" width="160" height="48" rx="10"/><text x="520" y="205">Karta otoka</text>
+        <rect class="node" x="630" y="176" width="160" height="48" rx="10"/><text x="710" y="198">Kartica otoka</text><text class="small" x="710" y="214" style="fill:#9fb2cb">napredak, zanimljivost</text>
+        <path class="edge" d="M600 200H626" marker-end="url(#ar)"/>
+        <path class="dec" d="M810 200L885 165L960 200L885 235Z"/><text x="885" y="196">Otok</text><text x="885" y="212">otvoren?</text>
+        <path class="edge" d="M790 200H806" marker-end="url(#ar)"/>
+        <path class="edge dash" d="M885 165V140H710V172" marker-end="url(#ar)"/>
+        <text class="lbl" x="797" y="134">ne: zaključan ili uskoro</text>
+
+        <!-- Red 3: razina -->
+        <path class="edge" d="M885 235V312" marker-end="url(#ar)"/><text class="lbl" x="897" y="278" style="text-anchor:start">da</text>
+        <rect class="hl" x="805" y="316" width="160" height="48" rx="10"/><text x="885" y="345">Razina</text>
+        <rect class="node" x="590" y="316" width="160" height="48" rx="10"/><text x="670" y="345">Okreni ogledalo</text>
+        <path class="edge" d="M805 340H754" marker-end="url(#ar)"/>
+        <path class="dec" d="M385 340L460 305L535 340L460 375Z"/><text x="460" y="336">Svi brodovi</text><text x="460" y="352">u luci?</text>
+        <path class="edge" d="M590 340H539" marker-end="url(#ar)"/>
+        <path class="edge dash" d="M460 305V282H670V312" marker-end="url(#ar)"/><text class="lbl" x="565" y="276">ne: novi potez</text>
+        <rect class="node" x="185" y="316" width="160" height="48" rx="10"/><text x="265" y="338">Pobjeda</text><text class="small" x="265" y="354" style="fill:#9fb2cb">brodovi zaplove, zvjezdice</text>
+        <path class="edge" d="M385 340H349" marker-end="url(#ar)"/><text class="lbl" x="367" y="330">da</text>
+
+        <!-- Red 4: kraj otoka -->
+        <path class="edge" d="M265 364V431" marker-end="url(#ar)"/>
+        <path class="dec" d="M190 470L265 435L340 470L265 505Z"/><text x="265" y="466">Zadnja razina</text><text x="265" y="482">na otoku?</text>
+        <rect class="node" x="400" y="446" width="160" height="48" rx="10"/><text x="480" y="475">Sljedeća razina</text>
+        <path class="edge" d="M340 470H396" marker-end="url(#ar)"/><text class="lbl" x="368" y="460">ne</text>
+        <path class="edge" d="M560 470H885V368" marker-end="url(#ar)"/>
+        <path class="edge" d="M265 505V538" marker-end="url(#ar)"/><text class="lbl" x="277" y="526" style="text-anchor:start">da</text>
+        <rect class="hl" x="170" y="542" width="190" height="52" rx="10"/><text x="265" y="564">Otok osvijetljen</text><text class="small" x="265" y="581" style="fill:#e6d6b0">otkriva se zanimljivost</text>
+        <path class="edge" d="M170 568H100V200H436" marker-end="url(#ar)"/><text class="lbl" x="108" y="390" style="text-anchor:start">natrag na kartu</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><i style="background:#ffc35a26;border:1px solid #ffc35a"></i>Glavni ekran</span>
+      <span><i style="background:#122843;border:1px solid #e6d6b0"></i>Korak</span>
+      <span><i style="border:1px dashed #e6d6b066"></i>Prozor preko izbornika</span>
+      <span><i style="background:#0a1729;border:1px solid #ffc35a;transform:rotate(45deg) scale(.7)"></i>Odluka</span>
+    </div>
+  </section>
+
+  <!-- Wireframeovi -->
+  <section>
+    <div class="head"><span class="eyebrow">Ekrani</span><h2>Wireframeovi</h2></div>
+    <p class="prose">Svi ekrani su složeni za uspravni mobitel širine oko 400 px. Ploča zauzima što više mjesta, a sve kontrole su ispod nje, na dohvat palca.</p>
+    <div class="wires">
+
+      <figure class="wire" style="margin:0">
+        <svg class="wf" viewBox="0 0 180 360" role="img" aria-label="Wireframe početnog izbornika">
+          <rect class="frame" x="1" y="1" width="178" height="358" rx="18"/>
+          <rect x="34" y="96" width="12" height="26" rx="2" class="blk"/><circle cx="40" cy="96" r="7" fill="#ffc35a" opacity=".8"/>
+          <path d="M46 96L150 84V104Z" fill="#ffc35a" opacity=".18"/>
+          <text class="t" x="54" y="118" style="font-size:22px">PHAROS</text>
+          <rect x="44" y="134" width="92" height="5" rx="2" class="blk"/>
+          <rect class="btn" x="40" y="156" width="100" height="22" rx="11"/><text x="90" y="171" text-anchor="middle" style="fill:#0a1729;font-weight:700">Igraj</text>
+          <rect class="btn2" x="40" y="184" width="100" height="20" rx="10"/><text x="90" y="198" text-anchor="middle">Kako se igra</text>
+          <rect class="btn2" x="40" y="210" width="100" height="20" rx="10"/><text x="90" y="224" text-anchor="middle">Postavke</text>
+          <rect class="btn2" x="40" y="236" width="100" height="20" rx="10"/><text x="90" y="250" text-anchor="middle">O igri</text>
+          <path class="dim" d="M8 312q12-5 24 0t24 0 24 0 24 0 24 0 24 0 24 0M8 324q12-5 24 0t24 0 24 0 24 0 24 0 24 0 24 0"/>
+        </svg>
+        <h3>Početni izbornik</h3>
+        <p>Animacija pali svjetionik, a zraka staje na imenu igre. Jedan glavni gumb, ostalo je sporedno.</p>
+      </figure>
+
+      <figure class="wire" style="margin:0">
+        <svg class="wf" viewBox="0 0 180 360" role="img" aria-label="Wireframe karte otoka">
+          <rect class="frame" x="1" y="1" width="178" height="358" rx="18"/>
+          <circle class="dim" cx="22" cy="30" r="9"/><text class="t" x="38" y="35">Karta otoka</text><text x="160" y="34" text-anchor="end">1/10</text>
+          <rect class="dim" x="12" y="50" width="156" height="150" rx="10"/>
+          <path class="dim" d="M110 50L168 92V50Z" fill="#1d3656"/>
+          <path class="land" d="M70 72q20-6 40 0t10 8-40 2-10-10z"/><path class="land" d="M64 96q40-8 80 2l-4 6q-36-4-74-2z"/>
+          <path class="land" d="M88 128q34-6 64 2l-6 6q-30-4-58 0z"/><path class="land" d="M118 154q10-4 18 2l-8 6-10-3z"/>
+          <path class="land" d="M40 112q10-4 20 1t-4 8-14-2z"/><path class="sel" d="M34 108q16-10 32 2t-8 16-22-4z"/>
+          <circle cx="50" cy="116" r="2" fill="#ffc35a"/><circle cx="32" cy="132" r="2" class="blk"/><circle cx="14" cy="114" r="1.6" class="blk"/>
+          <rect class="dim" x="12" y="214" width="156" height="96" rx="10"/>
+          <rect x="24" y="226" width="50" height="4" rx="2" class="blk"/><text class="t" x="24" y="250" style="font-size:15px">Vis</text>
+          <rect x="24" y="260" width="120" height="4" rx="2" class="blk"/>
+          <rect class="btn" x="24" y="276" width="56" height="20" rx="10"/><text x="52" y="290" text-anchor="middle" style="fill:#0a1729;font-weight:700">Igraj</text>
+        </svg>
+        <h3>Karta otoka</h3>
+        <p>Pravi obrisi otoka. Odabrani otok dobije toplu liniju, a kartica ispod kaže napredak i što slijedi.</p>
+      </figure>
+
+      <figure class="wire" style="margin:0">
+        <svg class="wf" viewBox="0 0 180 360" role="img" aria-label="Wireframe razine">
+          <rect class="frame" x="1" y="1" width="178" height="358" rx="18"/>
+          <circle class="dim" cx="22" cy="30" r="9"/><text x="38" y="24" style="font-size:7px;fill:#9fb2cb">OTOK VIS</text><text class="t" x="38" y="38">Razina 5</text>
+          <text x="132" y="32" text-anchor="middle" style="font-size:11px">2</text><text x="156" y="32" text-anchor="middle" style="font-size:11px">4</text>
+          <path class="ln" d="M26 66q6-14 40-12t64 2 30 30-4 60 6 50-50 12-66-4-14-60 2-50-8-28z" fill="#122843"/>
+          <g stroke="#1d3656"><path d="M48 52V214M72 52V214M96 52V214M120 52V214M144 56V210M18 82H166M18 106H166M18 130H166M18 154H166M18 178H166"/></g>
+          <path class="beam" d="M34 142H84V94H132"/>
+          <rect x="28" y="136" width="10" height="13" rx="2" fill="#e9eff7"/>
+          <path d="M76 86l16 16M124 86l16 16M100 160l16 16" stroke="#e9eff7" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M126 196h18l-3 5h-12z" fill="#c9d4e3"/><path d="M135 180v14h-8z" fill="#ff6b5e"/>
+          <rect x="16" y="234" width="140" height="4" rx="2" class="blk"/><rect x="16" y="244" width="96" height="4" rx="2" class="blk"/>
+          <g class="btn2"><circle cx="24" cy="272" r="8" stroke="#ffc35a"/><circle cx="44" cy="272" r="8"/><circle cx="64" cy="272" r="8"/><circle cx="84" cy="272" r="8"/><circle cx="104" cy="272" r="8"/></g>
+          <rect class="btn2" x="16" y="292" width="64" height="20" rx="10"/><text x="48" y="306" text-anchor="middle">Ispočetka</text>
+        </svg>
+        <h3>Razina</h3>
+        <p>Ploča u obliku otoka. Gore potezi i cilj, ispod savjet, brojevi razina i gumb za ponovni početak.</p>
+      </figure>
+
+      <figure class="wire" style="margin:0">
+        <svg class="wf" viewBox="0 0 180 360" role="img" aria-label="Wireframe pobjede">
+          <rect class="frame" x="1" y="1" width="178" height="358" rx="18"/>
+          <circle class="dim" cx="22" cy="30" r="9"/><text class="t" x="38" y="35">Razina 5</text>
+          <path class="ln" d="M26 66q6-14 40-12t64 2 30 30-4 60 6 50-50 12-66-4-14-60 2-50-8-28z" fill="#122843" opacity=".5"/>
+          <rect x="12" y="56" width="156" height="166" rx="12" fill="#0a1729" opacity=".8"/>
+          <text class="t" x="90" y="104" text-anchor="middle" style="font-size:12px">Svi brodovi su u luci</text>
+          <text x="90" y="120" text-anchor="middle" style="fill:#9fb2cb">Riješeno u 4 poteza (cilj: 4)</text>
+          <text x="90" y="148" text-anchor="middle" style="font-size:20px;fill:#ffc35a;letter-spacing:4px">★★★</text>
+          <rect class="btn" x="46" y="166" width="88" height="22" rx="11"/><text x="90" y="181" text-anchor="middle" style="fill:#0a1729;font-weight:700">Sljedeća razina</text>
+          <path d="M40 240h100" class="dim"/><text x="90" y="262" text-anchor="middle" style="fill:#9fb2cb">Na zadnjoj razini otoka:</text>
+          <rect x="24" y="272" width="132" height="44" rx="6" fill="none" stroke="#ffc35a" stroke-width="1"/>
+          <text x="34" y="288" style="font-size:7px;fill:#ffc35a;letter-spacing:1px">ZANIMLJIVOST</text>
+          <rect x="34" y="296" width="110" height="4" rx="2" class="blk"/><rect x="34" y="304" width="80" height="4" rx="2" class="blk"/>
+        </svg>
+        <h3>Pobjeda</h3>
+        <p>Brodovi zaplove, zvjezdice prema broju poteza. Na kraju otoka igrač dobije zanimljivost o mjestu.</p>
+      </figure>
+
+      <figure class="wire" style="margin:0">
+        <svg class="wf" viewBox="0 0 180 360" role="img" aria-label="Wireframe pravila igre">
+          <rect class="frame" x="1" y="1" width="178" height="358" rx="18"/>
+          <rect x="10" y="64" width="160" height="236" rx="12" fill="#122843" stroke="#1d3656"/>
+          <text class="t" x="22" y="90" style="font-size:14px">Kako se igra</text>
+          <g>
+            <rect x="22" y="104" width="18" height="18" rx="4" class="blk"/><path d="M26 118l10-10" stroke="#e9eff7" stroke-width="2"/><rect x="48" y="111" width="100" height="4" rx="2" class="blk"/>
+            <rect x="22" y="130" width="18" height="18" rx="4" class="blk"/><path d="M26 144h10l-2 2h-6z" fill="#c9d4e3"/><rect x="48" y="137" width="90" height="4" rx="2" class="blk"/>
+            <rect x="22" y="156" width="18" height="18" rx="4" class="blk"/><path d="M31 159l6 11h-12z" fill="#4fb6ff"/><rect x="48" y="163" width="96" height="4" rx="2" class="blk"/>
+            <rect x="22" y="182" width="18" height="18" rx="4" class="blk"/><rect x="26" y="186" width="10" height="10" rx="3" fill="#ff6b5e" opacity=".6"/><rect x="48" y="189" width="104" height="4" rx="2" class="blk"/>
+            <rect x="22" y="208" width="18" height="18" rx="4" class="blk"/><path d="M25 224c0-8 3-12 6-12s6 4 6 12z" fill="#34404f"/><rect x="48" y="215" width="88" height="4" rx="2" class="blk"/>
+            <rect x="22" y="234" width="18" height="18" rx="4" class="fog"/><rect x="48" y="241" width="98" height="4" rx="2" class="blk"/>
+          </g>
+          <rect class="btn" x="22" y="266" width="66" height="20" rx="10"/><text x="55" y="280" text-anchor="middle" style="fill:#0a1729;font-weight:700">Razumijem</text>
+        </svg>
+        <h3>Kako se igra</h3>
+        <p>Jedno pravilo po retku, sa sličicom iz igre. Za ležerne igrače koji ne žele pogađati.</p>
+      </figure>
+
+    </div>
+  </section>
+
+  <!-- Odluke -->
+  <section>
+    <div class="head"><span class="eyebrow">Zašto je tako</span><h2>Ključne odluke dizajna</h2></div>
+    <div class="decisions">
+      <div class="colhead"><span>Odluka</span><span>Zašto</span><span>Rezultat</span></div>
+      <div class="decision"><h3>Bez tajmera i bez gubljenja</h3><p>Ciljana publika igra da se opusti. Pritisak vremena i kazne rade suprotno.</p><p class="res">Jedino mjerilo je broj poteza, a za njega se dobivaju zvjezdice.</p></div>
+      <div class="decision"><h3>Jedna topla boja: svjetlo</h3><p>Na tamnoj podlozi oko odmah nađe ono što je važno: kamo ide zraka.</p><p class="res">Mornarsko plava i pijesak kao stara pomorska karta, a žuta je samo za svjetlo i glavne gumbe.</p></div>
+      <div class="decision"><h3>Ploča u obliku otoka</h3><p>Igrač treba osjetiti da je na otoku, a ne na apstraktnoj mreži.</p><p class="res">Svaka razina ima svoj obris s valovitom obalom i linijom dubine kao na karti.</p></div>
+      <div class="decision"><h3>Jedna nova mehanika po otoku</h3><p>Test je pokazao da iskusnim igračima sadržaj brzo dosadi.</p><p class="res">Biševo uvodi Modru špilju, a Svetac maglu. Mehanika je vezana uz mjesto.</p></div>
+      <div class="decision"><h3>Učenje igranjem, a ne čitanjem</h3><p>Prva razina traži samo jedan dodir. Svaka nova stvar uvodi se sama na jednostavnoj razini.</p><p class="res">Testeri nisu trebali savjete. Pravila su dostupna, ali ne stoje na putu.</p></div>
+      <div class="decision"><h3>Animacija koja se može preskočiti</h3><p>Uvod gradi atmosferu, ali ne smije usporavati igrača koji se vraća.</p><p class="res">Dodir preskače animaciju i ne pritišće slučajno gumb ispod. Uz smanjeno kretanje animacije nema.</p></div>
+      <div class="decision"><h3>Veća polja za dodir na karti</h3><p>Palagruža i Svetac na karti su veliki svega par piksela.</p><p class="res">Svaki otok ima nevidljivo veće polje za dodir.</p></div>
+      <div class="decision"><h3>Zvuk podređen tišini</h3><p>Prvi zvukovi igre bili su preglasni u odnosu na more u pozadini.</p><p class="res">Tiši zvukovi, malo glasniji valovi, a sve se može isključiti u postavkama.</p></div>
+    </div>
+  </section>
+
+  <!-- Testiranje -->
+  <section>
+    <div class="head"><span class="eyebrow">Što su rekli igrači</span><h2>Testiranje</h2></div>
+    <div class="test">
+      <div class="box">
+        <h3>Test 1: otok Vis</h3>
+        <p class="prose">3 iskusna igrača, prva objavljena verzija sa 16 razina, na mobitelu.</p>
+        <ul>
+          <li>Svi su odmah shvatili da treba dodirnuti ogledalo.</li>
+          <li>Većina je odigrala svih 16 razina u jednom sjedenju.</li>
+          <li>Savjeti ispod ploče nisu bili potrebni.</li>
+          <li>Prizma i filteri boja bili su jasni bez objašnjenja.</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>Što se promijenilo</h3>
+        <ol>
+          <li>Novi otoci donose novu mehaniku (Modra špilja, magla).</li>
+          <li>Težina od Biševa raste brže: cilj ide do 7 poteza, a na Visu je bio najviše 5.</li>
+          <li>Dodani početni izbornik, pravila igre, zvuk i postavke.</li>
+        </ol>
+      </div>
+      <div class="box wide">
+        <h3>Sljedeći test</h3>
+        <ul>
+          <li>Dva do tri ležerna igrača, bliže personi Ivani: trebaju li im savjeti i je li im težina prava?</li>
+          <li>Bilježiti gdje zapnu, čitaju li savjete i koliko traje jedna razina.</li>
+          <li>Razumiju li Modru špilju i maglu bez objašnjenja?</li>
+        </ul>
+        <div class="mech" aria-label="Mehanike u igri">
+          <span><b>Ogledalo</b> · Vis</span><span><b>Prizma</b> · Vis</span><span><b>Filter boja</b> · Vis</span><span><b>Modra špilja</b> · Biševo</span><span><b>Magla</b> · Svetac</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Pharos · Antonio Glavač · 2026.</span>
+    <span>Obrisi obale na karti: © OpenStreetMap contributors</span>
+  </footer>
+</main>

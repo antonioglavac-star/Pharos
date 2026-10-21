@@ -81,7 +81,7 @@ Oznake ćelija:
 4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; ~~Svetac~~ – 12 razina, magla; Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
 5. ~~Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora)~~ (gotovo za srednju i južnu Dalmaciju); još treba karta s pomicanjem i zumiranjem za cijelu obalu
 6. ~~Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija~~ (gotovo, uz postavke u izborniku)
-7. UX dokumentacija: persona, user flow, wireframeovi (za portfolio)
+7. ~~UX dokumentacija: persona, user flow, wireframeovi (za portfolio)~~ – prva verzija u `docs/ux-dokumentacija.html`, objavljena kao privatni Artifact https://claude.ai/artifact/FFTMmc5qHkrUmeaW5Z4o17 (dopunjavati nakon novih testova)
 
 ## Smjernice
 
