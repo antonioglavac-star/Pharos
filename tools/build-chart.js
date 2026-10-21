@@ -84,7 +84,7 @@ function offset(r, o) {
   });
 }
 
-const isles = {}, labels = {}, contours = {};
+const isles = {}, labels = {}, contours = {}, detail = {};
 let land = '';
 const gameRing = {};
 for (const r of rings) {
@@ -105,6 +105,9 @@ for (const pts of open) land += d(dp(proj(pts), .45));
 for (const [id, pr] of Object.entries(gameRing)) {
   const s = dpRing(pr, .3), b = box(s);
   isles[id] = d(s);
+  // Detaljniji obris za ekran otoka (otok se tamo prikazuje preko cijele širine)
+  const size = Math.max(b.x1 - b.x0, b.y1 - b.y0), ds = dpRing(pr, Math.max(size / 160, .008));
+  detail[id] = 'M' + ds.map(([x, y]) => x.toFixed(2) + ' ' + y.toFixed(2)).join('L') + 'Z';
   contours[id] = d(dpRing(offset(dpRing(pr, .8), 3.2), .6));
   // Težište površine: kod dugih otoka tu idu lampa i ime (unutar otoka), kod malih ime ide ispod
   let A = 0, gx = 0, gy = 0;
@@ -123,6 +126,7 @@ const CHART = {
   land: '${land}',
   isles: ${JSON.stringify(isles)},
   contours: ${JSON.stringify(contours)},
+  detail: ${JSON.stringify(detail)},
   c: ${JSON.stringify(labels)}
 };
 `;

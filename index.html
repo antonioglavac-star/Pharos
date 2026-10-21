@@ -89,10 +89,32 @@
     <div class="card" id="card" aria-live="polite"></div>
   </section>
 
+  <section class="screen" id="isle" hidden>
+    <header>
+      <div class="titlebar">
+        <button class="back" id="isleBack" aria-label="Natrag na kartu">←</button>
+        <div>
+          <div class="eyebrow">Otok</div>
+          <h1 id="isleName">Vis</h1>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="isleCount">0/16</b><span>Razine</span></div>
+        <div class="stat"><b id="isleStars">0/48</b><span>Zvjezdice</span></div>
+      </div>
+    </header>
+    <div class="isle-wrap" id="isleWrap">
+      <svg class="isle-svg" id="isleSvg" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      <div class="isle-marks" id="isleMarks"></div>
+    </div>
+    <button class="btn primary big" id="islePlay">Igraj 1. razinu</button>
+    <div class="fact" id="isleFact" hidden></div>
+  </section>
+
   <section class="screen" id="game" hidden>
     <header>
       <div class="titlebar">
-        <button class="back" id="back" aria-label="Natrag na kartu">←</button>
+        <button class="back" id="back" aria-label="Natrag na otok">←</button>
         <div>
           <div class="eyebrow" id="island">Otok Vis</div>
           <h1 id="title">Razina 1</h1>
@@ -114,7 +136,10 @@
           <p id="winText"></p>
           <div class="stars" id="stars"></div>
           <div class="fact" id="winFact" hidden></div>
-          <button class="btn primary" id="next">Sljedeća razina</button>
+          <div class="win-btns">
+            <button class="btn primary" id="next">Sljedeća razina</button>
+            <button class="btn" id="winIsle">Karta otoka</button>
+          </div>
         </div>
       </div>
     </div>
@@ -143,6 +168,7 @@
 <script src="js/game.js"></script>
 <script src="js/chart.js"></script>
 <script src="js/map.js"></script>
+<script src="js/island.js"></script>
 <script src="js/menu.js"></script>
 </body>
 </html>

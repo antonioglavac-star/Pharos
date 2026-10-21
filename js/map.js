@@ -12,7 +12,7 @@ function islandStatus(i){
 const STATUS_LABEL = { soon:'uskoro', done:'osvijetljen', open:'otvoren', locked:'zaključan' };
 
 function showMap(){
-  $('game').hidden = true; $('start').hidden = true; $('map').hidden = false;
+  $('game').hidden = true; $('isle').hidden = true; $('start').hidden = true; $('map').hidden = false;
   if (!sel){
     const i = ISLANDS.findIndex((I,i) => islandStatus(i)==='open');
     sel = ISLANDS[i<0 ? 0 : i].id;
@@ -45,9 +45,15 @@ function renderMap(){
       <path d="M0-22L4-4L22 0L4 4L0 22L-4 4L-22 0L-4-4Z"/><text y="-27">S</text></g>
     <text class="osm" x="6" y="${H-6}">© OpenStreetMap</text>
     ${isles}`;
+  // Dodir na otvoren ili osvijetljen otok otvara kartu otoka; ostali otoci samo pokažu karticu
+  const pick = id => {
+    sel = id;
+    const st = islandStatus(ISLANDS.findIndex(I => I.id===id));
+    if (st==='open' || st==='done') showIsle(id); else renderMap();
+  };
   $('chart').querySelectorAll('.isle').forEach(g => {
-    g.onclick = () => { sel = g.dataset.id; renderMap(); };
-    g.onkeydown = e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); sel = g.dataset.id; renderMap(); $('cardBtn')?.focus(); } };
+    g.onclick = () => pick(g.dataset.id);
+    g.onkeydown = e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(g.dataset.id); } };
   });
   const lit = ISLANDS.filter(I => islandDone(I.id)).length;
   $('litCount').textContent = `${lit}/${ISLANDS.length}`;
@@ -62,8 +68,8 @@ function renderCard(){
     : st==='open' ? '<p>Osvijetli sve razine i otkrij priču otoka.</p>'
     : st==='locked' ? '<p>Najprije osvijetli prethodni otok.</p>'
     : '<p>Svjetionik na ovom otoku još čeka čuvara. Novi otoci stižu uskoro.</p>';
-  const btn = st==='open' ? (solved ? 'Nastavi' : 'Igraj') : st==='done' ? 'Igraj ponovno' : '';
+  const btn = st==='open' ? (solved ? 'Nastavi' : 'Igraj') : st==='done' ? 'Otvori otok' : '';
   $('card').innerHTML = `<div class="eyebrow">${eyebrow}</div><h2>${I.name}</h2>${text}
     ${btn ? `<button class="btn primary" id="cardBtn">${btn}</button>` : ''}`;
-  if (btn) $('cardBtn').onclick = () => openIsland(I.id);
+  if (btn) $('cardBtn').onclick = () => showIsle(I.id);
 }

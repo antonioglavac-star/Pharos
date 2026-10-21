@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-let isl, LV, li = 0, state, moves = 0, won = false, toMap = false;
+let isl, LV, li = 0, state, moves = 0, won = false, toIsle = false;
 let fog = new Set();   // polja pod maglom koja zraka još nije dotaknula
 let litBefore = new Set(), quiet = true;   // koji su brodovi bili osvijetljeni prije poteza; tiho pri učitavanju razine
 const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -92,12 +92,14 @@ function drawCoast(L){
     <path class="shore" d="${d}"/>`;
 }
 
-function openIsland(id){
+// Pokreće razinu i otoka (bez i: prvu neriješenu)
+function openIsland(id, i){
   isl = ISLANDS.find(I => I.id===id); LV = LEVELS[id];
-  $('map').hidden = true; $('game').hidden = false;
+  $('map').hidden = true; $('isle').hidden = true; $('game').hidden = false;
   $('island').textContent = 'Otok ' + isl.name;
   const next = LV.findIndex(L => !progress[L.id]);
-  load(next<0 ? 0 : next);
+  load(i ?? (next<0 ? 0 : next));
+  window.scrollTo(0, 0);
 }
 
 function load(i){
@@ -230,13 +232,14 @@ function showWin(){
   const s = moves<=L.par ? 3 : moves<=L.par+2 ? 2 : 1;
   saveStars(L.id, s);
   const justLit = !wasDone && islandDone(isl.id);
-  toMap = justLit || li===LV.length-1;
+  toIsle = justLit || li===LV.length-1;
   $('winTitle').textContent = justLit ? `Otok ${isl.name} je osvijetljen` : 'Svi brodovi su u luci';
   $('stars').innerHTML = [1,2,3].map(i=>`<span class="${i<=s?'':'off'}">★</span>`).join('');
   $('winText').textContent = `Riješeno u ${moves} ${moves===1?'potezu':'poteza'} (cilj: ${L.par}).`;
   $('winFact').hidden = !(justLit && isl.fact);
   $('winFact').innerHTML = `<b>Zanimljivost</b>${isl.fact}`;
-  $('next').textContent = toMap ? 'Na kartu' : 'Sljedeća razina';
+  $('next').textContent = toIsle ? 'Na otok' : 'Sljedeća razina';
+  $('winIsle').hidden = toIsle;
   $('win').hidden = false;
   renderDots();
   $('next').focus();
@@ -248,5 +251,6 @@ function renderDots(){
 }
 
 $('reset').onclick = () => load(li);
-$('next').onclick = () => toMap ? showMap() : load(li+1);
-$('back').onclick = () => showMap();
+$('next').onclick = () => toIsle ? showIsle(isl.id) : load(li+1);
+$('winIsle').onclick = () => showIsle(isl.id);
+$('back').onclick = () => showIsle(isl.id);

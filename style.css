@@ -181,6 +181,23 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .isle .lamp{fill:var(--beam);filter:drop-shadow(0 0 4px var(--beam))}
 .isle.sel .contour,.isle:focus-visible .contour{stroke:var(--beam);stroke-width:1.2;stroke-dasharray:none}
 @media (prefers-reduced-motion:no-preference){ .isle.open .lamp{animation:flicker 2.4s ease-in-out infinite} }
+/* Karta otoka: obris otoka, plićak oko njega i staza razina uz obalu */
+.isle-wrap{position:relative;width:100%;border-radius:14px;background:var(--sea);box-shadow:0 0 0 1px var(--line),0 20px 50px #0008}
+.isle-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.isle-shallow{fill:none;stroke:#e6d6b012;stroke-linejoin:round}
+.isle-land{fill:var(--sea-2);stroke:var(--sand);stroke-linejoin:round}
+.route{fill:none;stroke:var(--sand-dim);stroke-linecap:round;stroke-linejoin:round}
+.route.lit{stroke:var(--beam);stroke-dasharray:none;opacity:.8}
+.isle-marks{position:absolute;inset:0}
+.mk{position:absolute;translate:-50% -50%;width:36px;height:36px;border-radius:50%;padding:0;border:1.5px solid var(--sand-dim);background:var(--sea);color:var(--muted);font:700 13px var(--body);cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+.mk small{position:absolute;top:100%;left:50%;translate:-50% 1px;font-size:9px;letter-spacing:1px;color:var(--beam);white-space:nowrap}
+.mk.done{background:var(--beam);border-color:var(--beam);color:var(--sea)}
+.mk.cur{border-color:var(--beam);color:var(--beam);box-shadow:0 0 0 4px #ffc35a2e}
+.mk:disabled{opacity:.45;cursor:default}
+.mk:focus-visible{outline:2px solid var(--beam);outline-offset:3px}
+@media (prefers-reduced-motion:no-preference){ .mk.cur{animation:beacon 1.8s ease-in-out infinite} }
+@keyframes beacon{50%{box-shadow:0 0 0 8px #ffc35a14}}
+.win-btns{display:flex;flex-direction:column;gap:8px;align-items:center}
 .card{background:var(--sea-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .card h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0}
 .card p{margin:0;color:var(--muted);line-height:1.45}

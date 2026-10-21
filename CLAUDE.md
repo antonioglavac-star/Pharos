@@ -14,14 +14,15 @@ Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač rije
 
 ## Struktura
 
-- `index.html` – tri ekrana: početni izbornik (`#start`), karta (`#map`) i igra (`#game`), te prozori „Kako se igra” (`#how`) i „O igri” (`#about`)
+- `index.html` – četiri ekrana: početni izbornik (`#start`), karta (`#map`), otok (`#isle`) i igra (`#game`), te prozori „Kako se igra” (`#how`) i „O igri” (`#about`)
 - `js/feel.js` – zvukovi (stvoreni u pregledniku, bez audio datoteka), šum valova i vibracija; postavke se pamte pod ključem `svjetionik-postavke`
 - `js/menu.js` – početni izbornik i animacija pokretanja (lampa se upali, zraka obiđe nebo i stane na natpisu; dodir je preskače; isključena uz smanjeno kretanje)
 - `style.css` – izgled (boje su tokeni u `:root`)
 - `js/islands.js` – popis otoka redom otključavanja (`ISLANDS`), boje zraka (`COL`) i prazni `LEVELS`
 - `js/islands/<otok>.js` – razine jednog otoka, npr. `js/islands/vis.js` puni `LEVELS.vis`
 - `js/game.js` – logika igre: crtanje mreže, okretanje ogledala, praćenje zrake, pobjeda, spremanje napretka
-- `js/map.js` – karta otoka i kartica odabranog otoka
+- `js/map.js` – karta otoka i kartica odabranog otoka; dodir na otvoren otok otvara ekran otoka
+- `js/island.js` – ekran otoka (`#isle`): obris otoka i staza razina oko obale; dodir na razinu je pokreće. Razine su jednako razmaknute po glatkoj liniji oko otoka, počevši od najzapadnije točke
 - `js/chart.js` – obrisi obale i otoka prema OpenStreetMapu (stvara ga `tools/build-chart.js`, ne mijenjati ručno; upute su na vrhu alata). Navođenje izvora „© OpenStreetMap” mora ostati na karti i u „O igri”
 - `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.png` (prozirna pozadina) i `icon-*.png` su pripremljene verzije za igru
 - `docs/testiranje.md` – bilješke s testiranja s igračima (za portfolio)
