@@ -79,16 +79,17 @@ function coastPath(L, off, amp){
 }
 
 function drawCoast(L){
-  const sh = !!L.shape, W = L.w+(sh?1:0), H = L.h+(sh?1:0), b = $('board'), g = $('grid');
+  // Rub oko mreže (u poljima) je mali, da ploča bude što veća; linija dubine smije izaći preko ruba ploče
+  const M = .15, sh = !!L.shape, W = L.w+(sh?2*M:0), H = L.h+(sh?2*M:0), b = $('board'), g = $('grid');
   b.classList.toggle('shaped', sh);
   b.style.aspectRatio = W + ' / ' + H;
-  b.style.setProperty('--px', sh ? 50/W+'%' : '0%');
-  b.style.setProperty('--py', sh ? 50/H+'%' : '0%');
+  b.style.setProperty('--px', sh ? M*100/W+'%' : '0%');
+  b.style.setProperty('--py', sh ? M*100/H+'%' : '0%');
   g.style.clipPath = sh ? 'url(#isleClip)' : '';
   const c = $('coast');
   if (!sh){ c.innerHTML = ''; return; }
   const d = coastPath(L, .08, .06);
-  c.setAttribute('viewBox', `-.5 -.5 ${W} ${H}`);
+  c.setAttribute('viewBox', `${-M} ${-M} ${W} ${H}`);
   c.innerHTML = `<defs>
       <clipPath id="isleClip" clipPathUnits="objectBoundingBox"><path transform="scale(${1/L.w} ${1/L.h})" d="${d}"/></clipPath>
     </defs>
@@ -158,15 +159,48 @@ function load(i){
     g.appendChild(el);
   }
   $('moves').textContent = 0;
-  $('legCave').hidden = !Object.values(L.cells).includes('C');
-  $('legFog').hidden = !L.fog;
   L.tide = Object.values(L.cells).includes('T');
   $('tide').hidden = !L.tide;
-  $('legTide').hidden = !L.tide;
   litBefore = new Set(); quiet = true;
-  renderDots(); trace();
+  trace();
   quiet = false;
+  showTips(L);
 }
+
+// Upute u pravom trenutku: kad se predmet prvi put pojavi u igri, kratki prozor ga objasni (samo jednom)
+const TIPS = [
+  { key:'mirror', name:'Ogledalo', icon:() => '<div class="mirror" style="transform:rotate(-45deg)"></div>', has:L => Object.values(L.cells).some(v => v==='/' || v==='\\'),
+    text:'Dodirni ogledalo da ga okreneš. Zraka se od njega odbija pod pravim kutom. Dovedi svjetlo do svih brodova.' },
+  { key:'prism', name:'Prizma', icon:() => ICONS.prism(), has:L => Object.values(L.cells).includes('P'),
+    text:'Prizma dijeli zraku na dvije: jedna ide lijevo, a druga desno od smjera iz kojeg je zraka došla.' },
+  { key:'filter', name:'Filter boja', icon:() => ICONS.filter('r'), has:L => Object.values(L.cells).some(v => v[0]==='F'),
+    text:'Filter boji zraku. Obojeni brod uplovljava samo uz svjetlo svoje boje, a bijeli brod prima svako svjetlo.' },
+  { key:'cave', name:'Modra špilja', icon:() => ICONS.cave(), has:L => Object.values(L.cells).includes('C'),
+    text:'Modra špilja propušta samo plavu zraku, koja prolazi ravno kroz nju. Svaka druga zraka staje na ulazu.' },
+  { key:'fog', name:'Magla', icon:() => '<span class="fog-chip"></span>', has:L => !!L.fog,
+    text:'Magla skriva dio otoka. Kad zraka uđe u maglu, otkrije što je ispod. Ogledalo u magli ne možeš okretati dok ga zraka ne otkrije.' },
+  { key:'tide', name:'Plima i oseka', icon:() => ICONS.reef(), has:L => Object.values(L.cells).includes('T'),
+    text:'Svaki potez mijenja more. U plimi je hrid pod morem i zraka prelazi preko nje, a u oseci hrid izroni i zaustavi zraku. Pazi koliko poteza napraviš.' }
+];
+const TIPS_KEY = 'svjetionik-upute';
+let tipsSeen = [];
+try { tipsSeen = JSON.parse(localStorage.getItem(TIPS_KEY)) || []; } catch (e) {}
+let tipQueue = [];
+function showTips(L){
+  tipQueue = TIPS.filter(T => T.has(L) && !tipsSeen.includes(T.key));
+  nextTip();
+}
+function nextTip(){
+  const T = tipQueue.shift();
+  if (!T) return;
+  tipsSeen.push(T.key);
+  try { localStorage.setItem(TIPS_KEY, JSON.stringify(tipsSeen)); } catch (e) {}
+  $('tipIcon').innerHTML = T.icon();
+  $('tipTitle').textContent = T.name;
+  $('tipText').textContent = T.text;
+  setTimeout(() => { if (!$('tip').open) $('tip').showModal(); }, 250);
+}
+$('tip').addEventListener('close', () => nextTip());
 
 function rotate(k, el){
   if (won) return;
@@ -317,16 +351,17 @@ function showWin(){
   $('next').textContent = toIsle ? 'Na otok' : 'Sljedeća razina';
   $('winIsle').hidden = toIsle;
   $('win').hidden = false;
-  renderDots();
   $('next').focus();
 }
 
-function renderDots(){
-  $('dots').innerHTML = LV.map((L,i)=>`<button class="dot ${i===li?'cur':''} ${progress[L.id]?'done':''}" ${i>0&&!progress[LV[i-1].id]&&i!==li?'disabled':''} data-i="${i}" aria-label="Razina ${i+1}">${i+1}</button>`).join('');
-  $('dots').querySelectorAll('.dot').forEach(d=>d.onclick=()=>load(+d.dataset.i));
-}
-
 $('reset').onclick = () => load(li);
+// Pauza: nastavak, ponovni početak, karta otoka, postavke, početni izbornik
+$('pauseBtn').onclick = () => $('pause').showModal();
+$('pResume').onclick = () => $('pause').close();
+$('pRestart').onclick = () => { $('pause').close(); load(li); };
+$('pIsle').onclick = () => { $('pause').close(); showIsle(isl.id); };
+$('pSettings').onclick = () => { $('pause').close(); $('settings').showModal(); };
+$('pMenu').onclick = () => { $('pause').close(); showStart(false); };
 $('next').onclick = () => toIsle ? showIsle(isl.id) : load(li+1);
 $('winIsle').onclick = () => showIsle(isl.id);
 $('back').onclick = () => showIsle(isl.id);

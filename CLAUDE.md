@@ -82,6 +82,8 @@ Oznake ćelija:
 - `C` – Modra špilja (od Biševa): plava zraka prolazi ravno kroz nju i špilja zasvijetli, svaka druga zraka staje na ulazu
 - `T` – hrid (od Sušca): plima i oseka. Svaki potez mijenja more: na početku je plima (hrid pod morem, zraka prelazi), nakon neparnog broja poteza oseka (hrid zaustavlja zraku). Zato `par` broji i „poteze čekanja” (okretanje ogledala koje ne smeta), a alat traži rješenje po broju poteza, ne samo po skupu ogledala
 
+Upute u pravom trenutku (`TIPS` u `game.js`): kad se predmet prvi put pojavi u igri, iskoči kratki prozor s objašnjenjem, samo jednom (pamti se pod ključem `svjetionik-upute`). U igri nema legende ni trake s razinama; razine se biraju na karti otoka, a na karti otoka predmet ostaje zaključan dok igrač ne dođe do razine u kojoj se prvi put pojavljuje. Novi predmet treba dodati u `TIPS`.
+
 Pomoć „Pokaži potez” (`findHint` u `game.js`) iz trenutnog stanja traži najkraći put do rješenja i označi prvo ogledalo; ogledalo u magli ne može biti prvi potez.
 
 `par` je najmanji broj poteza. Nakon svake izmjene razina obavezno pokreni `node tools/check-levels.js` i ispravi `par` ako ne odgovara. Razina ne smije biti riješena na startu.

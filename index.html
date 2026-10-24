@@ -68,6 +68,25 @@
   <form method="dialog"><button class="btn primary">Zatvori</button></form>
 </dialog>
 
+<dialog class="sheet" id="pause" aria-labelledby="pauseTitle">
+  <h2 id="pauseTitle">Pauza</h2>
+  <div class="pause-btns">
+    <button class="btn primary" id="pResume">Nastavi</button>
+    <button class="btn" id="pRestart">Ispočetka</button>
+    <button class="btn" id="pIsle">Karta otoka</button>
+    <button class="btn" id="pSettings">Postavke</button>
+    <button class="btn" id="pMenu">Početni izbornik</button>
+  </div>
+</dialog>
+
+<dialog class="sheet tip" id="tip" aria-labelledby="tipTitle">
+  <div class="tip-icon" id="tipIcon" aria-hidden="true"></div>
+  <span class="eyebrow">Novo</span>
+  <h2 id="tipTitle">Prizma</h2>
+  <p id="tipText"></p>
+  <form method="dialog"><button class="btn primary">Razumijem</button></form>
+</dialog>
+
 <dialog class="sheet" id="about" aria-labelledby="aboutTitle">
   <h2 id="aboutTitle">O igri</h2>
   <p><b>Pharos</b> je opuštajuća logička igra. Kao čuvar svjetionika vodiš zraku svjetla do brodova i otok po otok pališ svjetla duž Jadrana.</p>
@@ -141,7 +160,7 @@
   </section>
 
   <section class="screen" id="game" hidden>
-    <header>
+    <header class="hud">
       <div class="titlebar">
         <button class="back" id="back" aria-label="Natrag na otok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
         <div>
@@ -149,12 +168,14 @@
           <h1 id="title">Razina 1</h1>
         </div>
       </div>
-      <div class="stats">
-        <div class="stat"><b id="moves">0</b><span>Potezi</span></div>
-        <div class="stat"><b id="par">1</b><span>Cilj</span></div>
+      <div class="hud-right">
+        <div class="count" aria-live="polite"><b><span id="moves">0</span><small>/<span id="par">1</span></small></b><span>Potezi</span></div>
+        <button class="back" id="reset" aria-label="Ispočetka"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v5h5"/></svg></button>
+        <button class="back" id="pauseBtn" aria-label="Izbornik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6v12M15 6v12"/></svg></button>
       </div>
     </header>
 
+    <div class="stage">
     <div class="board" id="board">
       <div class="grid" id="grid"></div>
       <svg class="coast" id="coast" preserveAspectRatio="none" aria-hidden="true"></svg>
@@ -174,23 +195,12 @@
       </div>
     </div>
 
-    <p class="tide" id="tide" hidden></p>
-    <p class="hint" id="hint"></p>
-
-    <div class="controls">
-      <div class="dots" id="dots"></div>
-      <div class="ctrl-btns">
-        <button class="btn" id="helpBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>Pokaži potez</button>
-        <button class="btn" id="reset">Ispočetka</button>
-      </div>
     </div>
-    <div class="legend">
-      <span><i style="background:#c9d4e3"></i>Ogledalo – dodirni za okretanje</span>
-      <span><i style="background:#7fd4ff"></i>Prizma – dijeli zraku</span>
-      <span><i style="background:linear-gradient(90deg,#ff6b5e 50%,#4fb6ff 50%)"></i>Filter – boji zraku; brod prima samo svoju boju</span>
-      <span id="legFog" hidden><i style="background:#a9bbd1"></i>Magla – zraka otkriva što je ispod</span>
-      <span id="legTide" hidden><i style="background:#2b5f8f"></i>Hrid – svaki potez mijenja plimu i oseku; u oseci zaustavlja zraku</span>
-      <span id="legCave" hidden><i style="background:#2f8fe0"></i>Modra špilja – propušta samo plavo svjetlo</span>
+
+    <div class="below">
+      <p class="tide" id="tide" hidden></p>
+      <p class="hint" id="hint"></p>
+      <button class="btn help" id="helpBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>Pokaži potez</button>
     </div>
   </section>
 </div>

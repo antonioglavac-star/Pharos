@@ -27,20 +27,19 @@ function showIsle(id){
   window.scrollTo(0, 0);
 }
 
-// Predmeti koji se pojavljuju na otoku; "Novo" ako ih nije bilo ni na jednom ranijem otoku
-const MECHS = [
-  { name:'Ogledalo', icon:() => '<div class="mirror" style="transform:rotate(-45deg)"></div>', has:L => Object.values(L.cells).some(v => v==='/' || v==='\\') },
-  { name:'Prizma', icon:() => ICONS.prism(), has:L => Object.values(L.cells).includes('P') },
-  { name:'Filter boja', icon:() => ICONS.filter('r'), has:L => Object.values(L.cells).some(v => v[0]==='F') },
-  { name:'Modra špilja', icon:() => ICONS.cave(), has:L => Object.values(L.cells).includes('C') },
-  { name:'Magla', icon:() => '<span class="fog-chip"></span>', has:L => !!L.fog },
-  { name:'Plima i oseka', icon:() => ICONS.reef(), has:L => Object.values(L.cells).includes('T') }
-];
+// Predmeti koji se pojavljuju na otoku (popis TIPS je u game.js). Predmet koji igrač još nije sreo
+// ostaje zaključan (silueta i lokot) dok ne dođe do razine u kojoj se prvi put pojavljuje.
+// "Novo" znači da ga nije bilo ni na jednom ranijem otoku.
+const LOCK = '<svg class="lock" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 function renderMechs(id){
-  const i = ISLANDS.findIndex(I => I.id===id);
+  const i = ISLANDS.findIndex(I => I.id===id), lv = LEVELS[id];
   const before = ISLANDS.slice(0, i).flatMap(I => LEVELS[I.id] || []);
-  $('isleMechs').innerHTML = MECHS.filter(M => LEVELS[id].some(M.has)).map(M =>
-    `<span class="mech"><i>${M.icon()}</i>${M.name}${before.some(M.has) ? '' : '<b>Novo</b>'}</span>`).join('');
+  $('isleMechs').innerHTML = TIPS.filter(M => lv.some(M.has)).map(M => {
+    const first = lv.findIndex(M.has), reached = first === 0 || !!progress[lv[first-1].id];
+    return reached
+      ? `<span class="mech"><i>${M.icon()}</i>${M.name}${before.some(M.has) ? '' : '<b>Novo</b>'}</span>`
+      : `<span class="mech locked" aria-label="Zaključano do ${first+1}. razine"><i>${M.icon()}${LOCK}</i>${first+1}. razina</span>`;
+  }).join('');
 }
 
 // Sljedeći otok: obris, ime i kada se otvara; dodir ulazi u njega ako je otvoren

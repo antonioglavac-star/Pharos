@@ -29,11 +29,15 @@ function renderMap(){
   const order = ISLANDS.map((I,i) => i).sort((a, b) => CHART.c[ISLANDS[b].id][2] - CHART.c[ISLANDS[a].id][2]);
   const isles = order.map(i => {
     const I = ISLANDS[i], st = islandStatus(i), [cx, cy, r, hh] = CHART.c[I.id];
+    // Magla rata: zaključani i budući otoci su pod morskom maglom s lokotom; osvijetljeni trajno svijetle zlatno
+    const hidden = st==='soon' || st==='locked';
     return `<g class="isle ${st} ${I.id===sel?'sel':''}" data-id="${I.id}" tabindex="0" role="button" aria-label="${I.name}, ${STATUS_LABEL[st]}">
       <path class="hit" d="${CHART.isles[I.id]}"/>
       ${r < 12 ? `<circle class="hit" cx="${cx}" cy="${cy}" r="13"/>` : ''}
       <path class="contour" d="${CHART.contours[I.id]}"/>
       <path class="land" d="${CHART.isles[I.id]}"/>
+      ${hidden ? `<path class="fogcover" d="${CHART.isles[I.id]}" filter="url(#mistBlur)"/>
+        <g class="lock" transform="translate(${cx} ${cy})"><rect x="-4" y="-1" width="8" height="6" rx="1.2"/><path d="M-2.4-1v-2a2.4 2.4 0 0 1 4.8 0v2"/></g>` : ''}
       ${st==='open'||st==='done' ? `<circle class="lamp" cx="${cx}" cy="${cy}" r="2.5"/>` : ''}
       <text x="${cx}" y="${hh ? cy+hh+13 : cy+13}">${I.name}</text>
     </g>`;
@@ -41,7 +45,8 @@ function renderMap(){
   $('chart').setAttribute('viewBox', `0 0 ${W} ${H}`);
   $('chart').innerHTML = `
     <defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="5"/></pattern></defs>
+      <line x1="0" y1="0" x2="0" y2="5"/></pattern>
+      <filter id="mistBlur" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="3"/></filter></defs>
     <g class="grat">${lines.join('')}</g>
     <path class="coast" d="${CHART.land}"/>
     <g class="rose" transform="translate(${W-45} ${H-55})">
