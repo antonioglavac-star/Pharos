@@ -28,6 +28,7 @@
     <p class="tagline">Upali svjetla Jadrana, otok po otok.</p>
     <nav class="menu">
       <button class="btn primary big" id="play">Igraj</button>
+      <button class="btn" id="lightsBtn">Svjetionici</button>
       <button class="btn" id="howBtn">Kako se igra</button>
       <button class="btn" id="settingsBtn">Postavke</button>
       <button class="btn" id="aboutBtn">O igri</button>
@@ -45,6 +46,8 @@
     <li><i class="r-filter"></i><span><b>Filter</b> boji zraku. Obojeni brod prima samo svoju boju.</span></li>
     <li><i class="r-cave"></i><span><b>Modra špilja</b> propušta samo plavo svjetlo.</span></li>
     <li><i class="r-fog"></i><span><b>Magla</b> skriva polja dok zraka ne prođe kroz njih.</span></li>
+    <li><i class="r-reef"></i><span><b>Hrid</b>: svaki potez mijenja plimu i oseku. U oseci hrid izroni i zaustavi zraku.</span></li>
+    <li><i class="r-help"></i><span>Zapneš li, <b>Pokaži potez</b> označi jedno ogledalo koje treba okrenuti.</span></li>
     <li><i class="r-star"></i><span>Riješi u <b>što manje poteza</b> za tri zvjezdice.</span></li>
   </ul>
   <form method="dialog"><button class="btn primary">Razumijem</button></form>
@@ -58,6 +61,11 @@
     <label class="switch"><span><b>Vibracija</b>Pri dodiru i pobjedi (ne radi na iPhoneu)</span><input type="checkbox" data-set="vibrate"></label>
   </div>
   <form method="dialog"><button class="btn primary">Gotovo</button></form>
+</dialog>
+
+<dialog class="sheet lh-dlg" id="lightDlg" aria-label="Svjetionik">
+  <div class="lh-body" id="lightBody"></div>
+  <form method="dialog"><button class="btn primary">Zatvori</button></form>
 </dialog>
 
 <dialog class="sheet" id="about" aria-labelledby="aboutTitle">
@@ -87,6 +95,22 @@
       <svg id="chart" viewBox="0 0 440 409" role="group" aria-label="Karta otoka"></svg>
     </div>
     <div class="card" id="card" aria-live="polite"></div>
+    <button class="next-isle" id="mapLights"></button>
+  </section>
+
+  <section class="screen" id="lights" hidden>
+    <header>
+      <div class="titlebar">
+        <button class="back" id="lightsBack" aria-label="Natrag"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+        <div>
+          <div class="eyebrow">Kolekcija</div>
+          <h1>Svjetionici</h1>
+        </div>
+      </div>
+      <div class="stats"><div class="stat"><b id="lightsCount">0/4</b><span>Skupljeno</span></div></div>
+    </header>
+    <p class="lh-intro">Svaki osvijetljeni otok donosi jedan pravi jadranski svjetionik.</p>
+    <div class="lh-grid" id="lightsGrid"></div>
   </section>
 
   <section class="screen" id="isle" hidden>
@@ -141,6 +165,7 @@
           <p id="winText"></p>
           <div class="stars" id="stars"></div>
           <div class="fact" id="winFact" hidden></div>
+          <button class="win-light" id="winLight" hidden></button>
           <div class="win-btns">
             <button class="btn primary" id="next">Sljedeća razina</button>
             <button class="btn" id="winIsle">Karta otoka</button>
@@ -149,17 +174,22 @@
       </div>
     </div>
 
+    <p class="tide" id="tide" hidden></p>
     <p class="hint" id="hint"></p>
 
     <div class="controls">
       <div class="dots" id="dots"></div>
-      <button class="btn" id="reset">Ispočetka</button>
+      <div class="ctrl-btns">
+        <button class="btn" id="helpBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>Pokaži potez</button>
+        <button class="btn" id="reset">Ispočetka</button>
+      </div>
     </div>
     <div class="legend">
       <span><i style="background:#c9d4e3"></i>Ogledalo – dodirni za okretanje</span>
       <span><i style="background:#7fd4ff"></i>Prizma – dijeli zraku</span>
       <span><i style="background:linear-gradient(90deg,#ff6b5e 50%,#4fb6ff 50%)"></i>Filter – boji zraku; brod prima samo svoju boju</span>
       <span id="legFog" hidden><i style="background:#a9bbd1"></i>Magla – zraka otkriva što je ispod</span>
+      <span id="legTide" hidden><i style="background:#2b5f8f"></i>Hrid – svaki potez mijenja plimu i oseku; u oseci zaustavlja zraku</span>
       <span id="legCave" hidden><i style="background:#2f8fe0"></i>Modra špilja – propušta samo plavo svjetlo</span>
     </div>
   </section>
@@ -169,11 +199,13 @@
 <script src="js/islands/vis.js"></script>
 <script src="js/islands/bisevo.js"></script>
 <script src="js/islands/svetac.js"></script>
+<script src="js/islands/susac.js"></script>
 <script src="js/feel.js"></script>
 <script src="js/game.js"></script>
 <script src="js/chart.js"></script>
 <script src="js/map.js"></script>
 <script src="js/island.js"></script>
+<script src="js/lighthouses.js"></script>
 <script src="js/menu.js"></script>
 </body>
 </html>

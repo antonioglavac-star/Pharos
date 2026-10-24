@@ -12,6 +12,14 @@ Igrač se kreće kartom hrvatske obale i otok po otok pali svjetlo duž Jadrana.
 
 Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač riješi sve razine na otoku. **Svaku činjenicu Antonio mora provjeriti prije objave.**
 
+## Monetizacija (Antonijeva odluka)
+
+Otoci se **ne kupuju**: otključavaju se samo igranjem. Zarada ide preko **reklama**. Prirodno mjesto za dobrovoljnu reklamu je pomoć „Pokaži potez” (reklama za pomoć), a reklame se ne smiju ubacivati usred igre ni između razina bez igračeva izbora. Reklame još nisu ugrađene.
+
+## Kolekcija svjetionika
+
+Kad igrač osvijetli otok, dobije jedan **stvarni** svjetionik (`js/lighthouses.js`, ekran `#lights`). Podaci su s Plovputovih stranica, a crteži prema njihovim fotografijama. Otoci bez klasičnog svjetionika dobiju najbliži ili istoimeni, uz iskrenu napomenu: Biševo → Host (ulaz u luku Vis), Svetac → Sveti Andrija kod Dubrovnika (isto ime). Za novi otok dodaj zapis u `LIGHTHOUSES` s istim ključem kao otok.
+
 ## Struktura
 
 - `index.html` – četiri ekrana: početni izbornik (`#start`), karta (`#map`), otok (`#isle`) i igra (`#game`), te prozori „Kako se igra” (`#how`) i „O igri” (`#about`)
@@ -22,6 +30,7 @@ Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač rije
 - `js/islands/<otok>.js` – razine jednog otoka, npr. `js/islands/vis.js` puni `LEVELS.vis`
 - `js/game.js` – logika igre: crtanje mreže, okretanje ogledala, praćenje zrake, pobjeda, spremanje napretka
 - `js/map.js` – karta otoka i kartica odabranog otoka; dodir na otvoren otok otvara ekran otoka
+- `js/lighthouses.js` – kolekcija svjetionika (`LIGHTHOUSES`, crteži, ekran `#lights` i prozor `#lightDlg`)
 - `js/island.js` – ekran otoka (`#isle`): obris otoka i staza razina oko obale; dodir na razinu je pokreće. Razine su jednako razmaknute po glatkoj liniji oko otoka, počevši od najzapadnije točke
 - `js/chart.js` – obrisi obale i otoka prema OpenStreetMapu (stvara ga `tools/build-chart.js`, ne mijenjati ručno; upute su na vrhu alata). Navođenje izvora „© OpenStreetMap” mora ostati na karti i u „O igri”
 - `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.png` (prozirna pozadina) i `icon-*.png` su pripremljene verzije za igru
@@ -71,6 +80,9 @@ Oznake ćelija:
 - `Fr`, `Fb` – filter (boji zraku u crveno / plavo)
 - `B` – brod (prima bilo koje svjetlo), `Br`, `Bb` – obojeni brod (samo svoja boja)
 - `C` – Modra špilja (od Biševa): plava zraka prolazi ravno kroz nju i špilja zasvijetli, svaka druga zraka staje na ulazu
+- `T` – hrid (od Sušca): plima i oseka. Svaki potez mijenja more: na početku je plima (hrid pod morem, zraka prelazi), nakon neparnog broja poteza oseka (hrid zaustavlja zraku). Zato `par` broji i „poteze čekanja” (okretanje ogledala koje ne smeta), a alat traži rješenje po broju poteza, ne samo po skupu ogledala
+
+Pomoć „Pokaži potez” (`findHint` u `game.js`) iz trenutnog stanja traži najkraći put do rješenja i označi prvo ogledalo; ogledalo u magli ne može biti prvi potez.
 
 `par` je najmanji broj poteza. Nakon svake izmjene razina obavezno pokreni `node tools/check-levels.js` i ispravi `par` ako ne odgovara. Razina ne smije biti riješena na startu.
 
@@ -79,7 +91,7 @@ Oznake ćelija:
 1. ~~Filteri boja~~ (gotovo)
 2. ~~Otoci kao zasebne datoteke, spremanje napretka, probna karta~~ (gotovo)
 3. Dovršiti otok Vis do 15–20 razina s postupnim rastom težine (16 razina složeno, čeka igranje i dotjerivanje)
-4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; ~~Svetac~~ – 12 razina, magla; Sušac, Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
+4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; ~~Svetac~~ – 12 razina, magla; ~~Sušac~~ – 12 razina, plima i oseka; Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
 5. ~~Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora)~~ (gotovo za srednju i južnu Dalmaciju); još treba karta s pomicanjem i zumiranjem za cijelu obalu
 6. ~~Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija~~ (gotovo, uz postavke u izborniku)
 7. ~~UX dokumentacija: persona, user flow, wireframeovi (za portfolio)~~ – prva verzija u `docs/ux-dokumentacija.html`, objavljena kao privatni Artifact https://claude.ai/artifact/FFTMmc5qHkrUmeaW5Z4o17 (dopunjavati nakon novih testova)

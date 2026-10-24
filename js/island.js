@@ -5,7 +5,7 @@ let isleId = null;
 function showIsle(id){
   isleId = id;
   const I = ISLANDS.find(x => x.id===id), lv = LEVELS[id];
-  ['start','map','game'].forEach(s => $(s).hidden = true);
+  ['start','map','game','lights'].forEach(s => $(s).hidden = true);
   $('isle').hidden = false;
   $('isleName').textContent = I.name;
   const solved = lv.filter(L => progress[L.id]).length;
@@ -33,7 +33,8 @@ const MECHS = [
   { name:'Prizma', icon:() => ICONS.prism(), has:L => Object.values(L.cells).includes('P') },
   { name:'Filter boja', icon:() => ICONS.filter('r'), has:L => Object.values(L.cells).some(v => v[0]==='F') },
   { name:'Modra špilja', icon:() => ICONS.cave(), has:L => Object.values(L.cells).includes('C') },
-  { name:'Magla', icon:() => '<span class="fog-chip"></span>', has:L => !!L.fog }
+  { name:'Magla', icon:() => '<span class="fog-chip"></span>', has:L => !!L.fog },
+  { name:'Plima i oseka', icon:() => ICONS.reef(), has:L => Object.values(L.cells).includes('T') }
 ];
 function renderMechs(id){
   const i = ISLANDS.findIndex(I => I.id===id);

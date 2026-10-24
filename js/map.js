@@ -12,7 +12,7 @@ function islandStatus(i){
 const STATUS_LABEL = { soon:'uskoro', done:'osvijetljen', open:'otvoren', locked:'zaključan' };
 
 function showMap(){
-  $('game').hidden = true; $('isle').hidden = true; $('start').hidden = true; $('map').hidden = false;
+  ['game','isle','start','lights'].forEach(s => $(s).hidden = true); $('map').hidden = false;
   if (!sel){
     const i = ISLANDS.findIndex((I,i) => islandStatus(i)==='open');
     sel = ISLANDS[i<0 ? 0 : i].id;
@@ -58,6 +58,12 @@ function renderMap(){
     g.onclick = () => pick(g.dataset.id);
     g.onkeydown = e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(g.dataset.id); } };
   });
+  const ids = Object.keys(LIGHTHOUSES), got = ids.filter(id => islandDone(id));
+  const first = got[0] || ids[0];
+  $('mapLights').innerHTML = `<svg viewBox="40 0 80 120" class="${got.length ? '' : 'dim'}" aria-hidden="true">${LIGHTHOUSES[first].svg}</svg>
+    <span><span class="eyebrow">Kolekcija</span><b>Svjetionici</b><small>Skupljeno ${got.length} od ${ids.length}</small></span>
+    <svg class="go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+  $('mapLights').onclick = () => showLights('map');
   const lit = ISLANDS.filter(I => islandDone(I.id)).length;
   $('litCount').textContent = `${lit}/${ISLANDS.length}`;
   renderCard();

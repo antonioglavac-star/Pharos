@@ -24,6 +24,8 @@ const ICONS = {
   filter: c => `<svg class="icon" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="7" fill="${COL[c]}" fill-opacity=".38" stroke="${COL[c]}" stroke-width="2.5"/><path d="M14 15l6-3" stroke="#fff9" stroke-width="2" stroke-linecap="round"/></svg>`,
   boat: c => `<svg class="icon" viewBox="0 0 40 40"><path d="M7 25h26l-4 7H11z" fill="#c9d4e3"/><path class="sail" d="M20 6v17H10z" fill="${c?COL[c]:'#e9eff7'}"/><path d="M21 9v14h8z" fill="#8ea3bf"/><path d="M5 34c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 6 2" stroke="#8ea3bf55" stroke-width="1.5" fill="none"/></svg>`,
   cave: () => `<svg class="icon" viewBox="0 0 40 40"><path d="M4 34C4 17 10 7 20 7s16 10 16 27z" fill="#34404f"/><path d="M9 30C10 19 14 12 20 11" stroke="#4a5768" stroke-width="2" fill="none" stroke-linecap="round"/><path class="mouth" d="M12 34c0-9 3.5-15 8-15s8 6 8 15z" fill="#07101d"/></svg>`,
+  // hrid: kamen s pjenom; u plimi ga prekrije more (klasa .up na ćeliji znači oseka)
+  reef: () => `<svg class="icon" viewBox="0 0 40 40"><path class="stone" d="M6 30c1-10 5-18 13-18 4 0 6 3 9 3 4 0 7 6 7 15z" fill="#4a5768"/><path class="stone" d="M12 21c2-4 5-6 8-6" stroke="#6a7889" stroke-width="2" fill="none" stroke-linecap="round"/><path class="sea" d="M3 23c3-2 5 2 8 0s5-2 8 0 5 2 8 0 5-2 8 0 4 1 3 1v12H3z" fill="#2b5f8f" fill-opacity=".8"/><path class="foam" d="M4 30c3-2 5 2 8 0s5-2 8 0 5 2 8 0 5-2 8 0" stroke="#e9eff7" stroke-opacity=".7" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,
   // svaka prizma ima svoj prijelaz boja, jer skrivena kopija (npr. u zatvorenom prozoru) ne smije pokvariti ostale
   prism: () => { const g = 'pg' + (++ICONS.n); return `<svg class="icon" viewBox="0 0 40 40"><defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bfe9ff"/><stop offset="1" stop-color="#5aa7ff"/></linearGradient></defs><path d="M20 7l13 23H7z" fill="url(#${g})" opacity=".9"/><path d="M20 7l-4 23" stroke="#fff8" stroke-width="1"/></svg>`; },
   n: 0
@@ -97,7 +99,7 @@ function drawCoast(L){
 // Pokreće razinu i otoka (bez i: prvu neriješenu)
 function openIsland(id, i){
   isl = ISLANDS.find(I => I.id===id); LV = LEVELS[id];
-  $('map').hidden = true; $('isle').hidden = true; $('game').hidden = false;
+  ['map','isle','lights','start'].forEach(s => $(s).hidden = true); $('game').hidden = false;
   $('island').textContent = 'Otok ' + isl.name;
   const next = LV.findIndex(L => !progress[L.id]);
   load(i ?? (next<0 ? 0 : next));
@@ -145,6 +147,7 @@ function load(i){
       else if (c && c.t==='F') el.innerHTML = ICONS.filter(c.c);
       else if (c && c.t==='P') el.innerHTML = ICONS.prism();
       else if (c && c.t==='C'){ el.classList.add('cave'); el.innerHTML = ICONS.cave(); }
+      else if (c && c.t==='T'){ el.classList.add('reef'); el.innerHTML = ICONS.reef(); }
     }
     el.classList.add('cell'); el.dataset.k = k;
     // Magla skriva polje dok zraka ne prođe kroz njega; skriveno ogledalo se ne može okretati
@@ -157,6 +160,9 @@ function load(i){
   $('moves').textContent = 0;
   $('legCave').hidden = !Object.values(L.cells).includes('C');
   $('legFog').hidden = !L.fog;
+  L.tide = Object.values(L.cells).includes('T');
+  $('tide').hidden = !L.tide;
+  $('legTide').hidden = !L.tide;
   litBefore = new Set(); quiet = true;
   renderDots(); trace();
   quiet = false;
@@ -170,11 +176,17 @@ function rotate(k, el){
   el.firstChild.style.transform = `rotate(${c.rot}deg)`;
   moves++; $('moves').textContent = moves;
   Feel.mirror();
+  $('hint').textContent = LV[li].hint;
   trace();
 }
 
-function trace(){
-  const L = LV[li], segs = [], lit = new Set(), wrong = new Set(), seen = new Set(), caveLit = new Set(), touched = new Set();
+// Plima i oseka: svakim potezom more se izmijeni. Na početku je plima (hridi pod morem, zraka prelazi),
+// nakon neparnog broja poteza oseka (hridi izrone i zaustave zraku).
+const lowTide = n => n % 2 === 1;
+
+// Put zrake za zadano stanje ploče, bez crtanja (koristi ga i pomoć "Pokaži jedan potez")
+function castBeam(L, st, low){
+  const segs = [], lit = new Set(), wrong = new Set(), seen = new Set(), caveLit = new Set(), touched = new Set();
   const q = [{x:L.light.x, y:L.light.y, dx:L.light.d[0], dy:L.light.d[1], col:'w'}];
   while (q.length){
     const r = q.shift();
@@ -184,8 +196,10 @@ function trace(){
       const nx=cx+r.dx, ny=cy+r.dy;
       const edge = [cx+.5+r.dx*.5, cy+.5+r.dy*.5];
       if (!onBoard(L,nx,ny)){ pts.push(edge); break; }
-      const k=nx+','+ny, c=state[k];
+      const k=nx+','+ny, c=st[k];
       touched.add(k);
+      // Hrid: u oseci zaustavlja zraku, u plimi je pod morem
+      if (c&&c.t==='T'){ if (low){ pts.push(edge); break; } cx=nx; cy=ny; continue; }
       if ((nx===L.light.x&&ny===L.light.y) || (c&&c.t==='#')){ pts.push(edge); break; }
       if (c&&c.t==='B'){ pts.push([nx+.5,ny+.5]); (!c.c || c.c===r.col ? lit : wrong).add(k); break; }
       if (c&&c.t==='F'){ pts.push([nx+.5,ny+.5]); go(nx,ny,r.dx,r.dy,c.c); break; }
@@ -202,6 +216,17 @@ function trace(){
     }
     segs.push({pts, col:COL[r.col]});
   }
+  return { segs, lit, wrong, caveLit, touched };
+}
+
+function trace(){
+  const L = LV[li], low = lowTide(moves);
+  const { segs, lit, wrong, caveLit, touched } = castBeam(L, state, low);
+  document.querySelectorAll('.reef').forEach(r => r.classList.toggle('up', low));
+  if (L.tide) $('tide').innerHTML = low
+    ? '<b>Oseka</b> · hridi su izronile i zaustavljaju zraku. Sljedeći potez donosi plimu.'
+    : '<b>Plima</b> · hridi su pod morem i zraka prelazi preko njih. Sljedeći potez donosi oseku.';
+  $('tide').classList.toggle('low', low);
   $('beams').innerHTML = segs.map(({pts,col})=>{const s=pts.map(a=>a.join(',')).join(' ');return `<polyline class="glow" stroke="${col}" points="${s}"/><polyline class="core" stroke="${col}" points="${s}"/>`}).join('');
   document.querySelectorAll('.cave').forEach(c => c.classList.toggle('lit', caveLit.has(c.dataset.k)));
   // Zraka raspršuje maglu: polje ostaje otkriveno do kraja pokušaja
@@ -212,6 +237,7 @@ function trace(){
     if (el.tagName==='BUTTON'){ el.disabled = false; el.setAttribute('aria-label','Ogledalo, dodirni za okretanje'); }
   }
   const boats = Object.keys(state).filter(k=>state[k].t==='B');
+  document.querySelectorAll('.hinted').forEach(h => h.classList.remove('hinted'));
   const fresh = [...lit].filter(k => !litBefore.has(k));
   litBefore = lit;
   document.querySelectorAll('.boat').forEach(b=>{
@@ -229,6 +255,47 @@ function trace(){
   } else if (!quiet && fresh.length) Feel.boat();
 }
 
+// Pomoć "Pokaži potez": iz trenutnog stanja traži najkraći niz okretanja do rješenja
+// (sve kombinacije ogledala, uz plimu i oseku) i vrati prvo ogledalo koje se smije dodirnuti.
+// Ogledalo u magli ne može biti prvi potez.
+function findHint(){
+  const L = LV[li], ms = Object.keys(state).filter(k => state[k].t==='m');
+  const boats = Object.keys(state).filter(k => state[k].t==='B');
+  const st = {}; for (const k in state) st[k] = { ...state[k] };
+  const flip = v => v==='/' ? '\\' : '/';
+  const solved = (mask, steps) => {
+    ms.forEach((k, i) => st[k].v = (mask >> i & 1) ? flip(state[k].v) : state[k].v);
+    const r = castBeam(L, st, lowTide(moves + steps));
+    return boats.every(b => r.lit.has(b));
+  };
+  // stanje = (koja su ogledala okrenuta, parnost broja poteza); first = prvi potez na putu do njega
+  const seen = new Map([['0,0', null]]), q = [[0, 0, -1, 0]];
+  while (q.length){
+    const [mask, par, first, steps] = q.shift();
+    if (steps > 0 && solved(mask, steps)) return ms[first];
+    for (let i = 0; i < ms.length; i++){
+      if (steps === 0 && fog.has(ms[i])) continue;
+      const nm = mask ^ (1 << i), np = par ^ 1, key = nm + ',' + np;
+      if (seen.has(key)) continue;
+      seen.set(key, null);
+      q.push([nm, np, steps === 0 ? i : first, steps + 1]);
+    }
+  }
+  return null;
+}
+
+$('helpBtn').onclick = () => {
+  if (won) return;
+  document.querySelectorAll('.hinted').forEach(h => h.classList.remove('hinted'));
+  const k = findHint();
+  if (k){
+    document.querySelector(`#grid [data-k="${k}"]`).classList.add('hinted');
+    $('hint').textContent = 'Okreni označeno ogledalo.';
+  } else {
+    $('hint').textContent = 'Potrebno ogledalo skriva se u magli. Usmjeri zraku u maglu da ga otkriješ.';
+  }
+};
+
 function showWin(){
   const L = LV[li], wasDone = islandDone(isl.id);
   const s = moves<=L.par ? 3 : moves<=L.par+2 ? 2 : 1;
@@ -240,6 +307,13 @@ function showWin(){
   $('winText').textContent = `Riješeno u ${moves} ${moves===1?'potezu':'poteza'} (cilj: ${L.par}).`;
   $('winFact').hidden = !(justLit && isl.fact);
   $('winFact').innerHTML = `<b>Zanimljivost</b>${isl.fact}`;
+  // Novi svjetionik u kolekciji
+  const H = justLit && typeof LIGHTHOUSES !== 'undefined' && LIGHTHOUSES[isl.id];
+  $('winLight').hidden = !H;
+  if (H){
+    $('winLight').innerHTML = `<svg viewBox="40 0 80 120" aria-hidden="true">${H.svg}</svg><span><small>Novi svjetionik u kolekciji</small><b>${H.name}</b></span>`;
+    $('winLight').onclick = () => openLight(isl.id);
+  }
   $('next').textContent = toIsle ? 'Na otok' : 'Sljedeća razina';
   $('winIsle').hidden = toIsle;
   $('win').hidden = false;

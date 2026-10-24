@@ -70,6 +70,19 @@ button.cell:disabled{cursor:default}
 button.cell:disabled::after{display:none}
 @media (prefers-reduced-motion:no-preference){ .fog:not(.clear) .mist{animation:mist 7s ease-in-out infinite alternate} }
 @keyframes mist{to{background-position:12% 8%,-10% -6%,0 0}}
+/* Hrid: u plimi je kamen pod morem (blijed, more visoko), u oseci izroni */
+.reef .stone{opacity:.28;transition:opacity .5s}
+.reef .sea,.reef .foam{transform:translateY(-5px);transition:transform .6s ease}
+.reef.up .stone{opacity:1}
+.reef.up .sea,.reef.up .foam{transform:translateY(4px)}
+.tide{margin:0;font-size:13px;color:var(--muted);line-height:1.45;padding:8px 12px;border-radius:10px;background:#2b5f8f26;border:1px solid #2b5f8f66}
+.tide b{color:#7fbfff}
+.tide.low{background:#4a576826;border-color:var(--line)}
+.tide.low b{color:var(--sand)}
+/* Pomoć: označeno ogledalo pulsira toplim prstenom */
+button.cell.hinted{box-shadow:inset 0 0 0 2px var(--beam)}
+@media (prefers-reduced-motion:no-preference){ button.cell.hinted{animation:hintPulse 1.1s ease-in-out infinite} }
+@keyframes hintPulse{50%{box-shadow:inset 0 0 0 2px var(--beam),inset 0 0 18px #ffc35a66}}
 .cave .mouth{transition:fill .4s}
 .cave svg{transition:filter .4s}
 .cave.lit .mouth{fill:#2f8fe0}
@@ -127,7 +140,8 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
   .intro .menu>:nth-child(2){animation-delay:2.1s}
   .intro .menu>:nth-child(3){animation-delay:2.2s}
   .intro .menu>:nth-child(4){animation-delay:2.3s}
-  .intro .progress{animation:rise .5s 2.4s both}
+  .intro .menu>:nth-child(5){animation-delay:2.4s}
+  .intro .progress{animation:rise .5s 2.5s both}
   .intro .waves{animation:fadeIn 1.2s .6s both, drift 9s 1.8s ease-in-out infinite alternate}
 }
 @keyframes lampOn{from{opacity:0;scale:.2}to{opacity:1;scale:1}}
@@ -157,6 +171,10 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .rules i{flex:none;width:36px;height:36px;border-radius:8px;background:var(--cell);border:.5px solid var(--line);display:grid;place-items:center;font-style:normal;color:var(--beam);font-size:18px}
 .rules i .icon{width:84%;height:84%}
 .rules i .fog-chip{width:100%;height:100%;border-radius:8px;background:radial-gradient(60% 45% at 30% 35%,#c9d4e3b3,#c9d4e300 70%),radial-gradient(55% 50% at 72% 62%,#a9bbd1a6,#a9bbd100 70%),#8ea3bf59}
+.rules i .bulb,#helpBtn svg{width:18px;height:18px;fill:none;stroke:var(--beam);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rules i .reef-up .stone{opacity:1}
+.ctrl-btns{display:flex;gap:8px;flex-wrap:wrap}
+#helpBtn{display:inline-flex;align-items:center;gap:6px}
 .rules i .mirror{width:80%;height:13%}
 .titlebar{display:flex;align-items:flex-end;gap:10px}
 .back{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--foam);cursor:pointer;flex:none;padding:0;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
@@ -221,6 +239,35 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .next-isle b{font-family:var(--display);font-size:20px;font-weight:800}
 .next-isle small{color:var(--muted);font-size:13px}
 .next-isle .go{flex:none;width:22px;height:22px;fill:none;stroke:var(--beam);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Kolekcija svjetionika */
+.lh-intro{margin:0;color:var(--muted)}
+.lh-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lh-card{display:flex;flex-direction:column;gap:4px;padding:10px;border-radius:14px;border:1px solid var(--line);background:var(--sea-2);color:var(--foam);font:inherit;text-align:left;cursor:pointer;min-width:0}
+.lh-card:not(.locked):hover{border-color:var(--muted)}
+.lh-card:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
+.lh-art{display:block;width:100%;height:auto;border-radius:10px;background:linear-gradient(#0f2a48,#16365a 70%)}
+.lh-card.locked{cursor:default}
+.lh-card.locked .lh-art{filter:grayscale(1) brightness(.32) contrast(1.2)}
+.lh-name{font-family:var(--display);font-weight:800;font-size:16px;margin-top:4px}
+.lh-sub{font-size:12px;color:var(--muted)}
+.lh-card.locked .lh-name{color:var(--muted);letter-spacing:.2em}
+.lh-more{grid-column:1/-1;font-size:13px;color:var(--muted);text-align:center;padding:10px;border:1px dashed var(--line);border-radius:12px}
+.lh-dlg{padding:16px}
+.lh-body{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.lh-body h2{margin:0}
+.lh-body p{margin:0}
+.lh-note{color:var(--sand)!important;font-size:14px;border-left:2px solid var(--sand-dim);padding-left:10px}
+.lh-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:4px 0 0}
+.lh-facts dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--sand)}
+.lh-facts dd{margin:0;font-size:14px;color:var(--foam)}
+.lh-src{font-size:12px}
+.lh-src a{color:var(--beam)}
+#mapLights>svg:first-child{width:40px;height:60px}
+#mapLights>svg.dim{filter:grayscale(1) brightness(.4)}
+.win-light{display:flex;align-items:center;gap:12px;margin:0 auto 14px;padding:8px 14px 8px 8px;border-radius:12px;border:1px solid var(--beam);background:#ffc35a14;color:var(--foam);font:inherit;text-align:left;cursor:pointer}
+.win-light svg{width:36px;height:54px;flex:none}
+.win-light small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--beam)}
+.win-light b{font-family:var(--display);font-size:16px}
 .win-btns{display:flex;flex-direction:column;gap:8px;align-items:center}
 .card{background:var(--sea-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .card h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0}

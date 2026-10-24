@@ -61,7 +61,7 @@ function fogPlayable(L, st, mirrors, init, mask) {
   return true;
 }
 
-function litBoats(L, st) {
+function litBoats(L, st, low = false) {
   const lit = new Set(), seen = new Set(), touched = new Set();
   lit.touched = touched;
   const q = [{ x: L.light.x, y: L.light.y, dx: L.light.d[0], dy: L.light.d[1], col: 'w' }];
@@ -74,6 +74,7 @@ function litBoats(L, st) {
       if (!onBoard(L, nx, ny)) break;
       const k = nx + ',' + ny, c = st[k];
       touched.add(k);
+      if (c && c.t === 'T') { if (low) break; cx = nx; cy = ny; continue; }
       if ((nx === L.light.x && ny === L.light.y) || (c && c.t === '#')) break;
       if (c && c.t === 'B') { if (!c.c || c.c === r.col) lit.add(k); break; }
       if (c && c.t === 'F') { go(nx, ny, r.dx, r.dy, c.c); break; }
@@ -113,10 +114,29 @@ for (const [island, list] of Object.entries(LEVELS)) {
       solutions.push([m, n]);
     }
   }
+  // Plima i oseka: svaki potez mijenja more (neparan broj poteza = oseka, hridi zaustavljaju zraku),
+  // pa najkraće rješenje traži pretraga po (okrenuta ogledala, parnost poteza)
+  const tide = Object.values(L.cells).includes('T');
+  if (tide) {
+    const seen = new Set(['0,0']), q = [[0, 0, 0]];
+    best = Infinity;
+    while (q.length) {
+      const [m, p, d] = q.shift();
+      if (d > 0) {
+        mirrors.forEach((k, i) => st[k].v = (m >> i & 1) ? (init[i] === '/' ? '\\' : '/') : init[i]);
+        if (boats.every(k => litBoats(L, st, p === 1).has(k))) { best = d; break; }
+      }
+      for (let i = 0; i < mirrors.length; i++) {
+        const nm = m ^ (1 << i), np = p ^ 1, key = nm + ',' + np;
+        if (!seen.has(key)) { seen.add(key); q.push([nm, np, d + 1]); }
+      }
+    }
+    mirrors.forEach((k, i) => st[k].v = init[i]);
+  }
   let status = 'OK';
   if (best === Infinity) { status = 'NERJEŠIVA'; ok = false; }
   else if (solvedAtStart) { status = 'RIJEŠENA NA STARTU'; ok = false; }
-  else if (!solutions.some(([m, n]) => n === best && fogPlayable(L, st, mirrors, init, m))) { status = 'magla skriva ogledalo koje treba okrenuti'; ok = false; }
+  else if (!tide && !solutions.some(([m, n]) => n === best && fogPlayable(L, st, mirrors, init, m))) { status = 'magla skriva ogledalo koje treba okrenuti'; ok = false; }
   else if (best !== L.par) { status = `par bi trebao biti ${best}`; ok = false; }
   console.log(`${L.id}: min ${best === Infinity ? '-' : best}, par ${L.par} -> ${status}`);
   }
