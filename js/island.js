@@ -15,10 +15,49 @@ function showIsle(id){
   const next = lv.findIndex(L => !progress[L.id]);
   $('islePlay').textContent = next < 0 ? 'Igraj ponovno od 1. razine' : `Igraj ${next+1}. razinu`;
   $('islePlay').onclick = () => openIsland(id, next < 0 ? 0 : next);
-  $('isleFact').hidden = !(islandDone(id) && I.fact);
-  $('isleFact').innerHTML = `<b>Zanimljivost</b>${I.fact}`;
+  // Zanimljivost: otkrivena kad je otok osvijetljen, inače najava nagrade
+  const lit = islandDone(id);
+  $('isleFact').classList.toggle('locked', !lit);
+  $('isleFact').hidden = lit && !I.fact;
+  $('isleFact').innerHTML = lit ? `<b>Zanimljivost</b>${I.fact}`
+    : `<b>Zanimljivost otoka</b>Osvijetli svih ${lv.length} razina i otkrij priču o otoku ${I.name}.`;
+  renderMechs(id);
+  renderNextIsle(id);
   drawIsle(id, lv);
   window.scrollTo(0, 0);
+}
+
+// Predmeti koji se pojavljuju na otoku; "Novo" ako ih nije bilo ni na jednom ranijem otoku
+const MECHS = [
+  { name:'Ogledalo', icon:() => '<div class="mirror" style="transform:rotate(-45deg)"></div>', has:L => Object.values(L.cells).some(v => v==='/' || v==='\\') },
+  { name:'Prizma', icon:() => ICONS.prism(), has:L => Object.values(L.cells).includes('P') },
+  { name:'Filter boja', icon:() => ICONS.filter('r'), has:L => Object.values(L.cells).some(v => v[0]==='F') },
+  { name:'Modra špilja', icon:() => ICONS.cave(), has:L => Object.values(L.cells).includes('C') },
+  { name:'Magla', icon:() => '<span class="fog-chip"></span>', has:L => !!L.fog }
+];
+function renderMechs(id){
+  const i = ISLANDS.findIndex(I => I.id===id);
+  const before = ISLANDS.slice(0, i).flatMap(I => LEVELS[I.id] || []);
+  $('isleMechs').innerHTML = MECHS.filter(M => LEVELS[id].some(M.has)).map(M =>
+    `<span class="mech"><i>${M.icon()}</i>${M.name}${before.some(M.has) ? '' : '<b>Novo</b>'}</span>`).join('');
+}
+
+// Sljedeći otok: obris, ime i kada se otvara; dodir ulazi u njega ako je otvoren
+function renderNextIsle(id){
+  const i = ISLANDS.findIndex(I => I.id===id), N = ISLANDS[i+1], el = $('isleNext');
+  el.hidden = !N;
+  if (!N) return;
+  const st = islandStatus(i+1), nums = CHART.detail[N.id].match(/-?\d+\.?\d*/g).map(Number);
+  const xs = nums.filter((_, k) => k%2 === 0), ys = nums.filter((_, k) => k%2), x0 = Math.min(...xs), y0 = Math.min(...ys);
+  const w = Math.max(...xs) - x0, h = Math.max(...ys) - y0, p = Math.max(w, h) * .12;
+  const sub = st==='soon' ? 'Uskoro stiže u igru'
+    : st==='locked' ? `Otvara se kad osvijetliš otok ${ISLANDS[i].name}`
+    : st==='done' ? 'Osvijetljen' : 'Otvoren';
+  el.disabled = !(st==='open' || st==='done');
+  el.innerHTML = `<svg viewBox="${x0-p} ${y0-p} ${w+2*p} ${h+2*p}" aria-hidden="true"><path d="${CHART.detail[N.id]}" style="stroke-width:${Math.max(w, h)/40}"/></svg>
+    <span><span class="eyebrow">Sljedeći otok</span><b>${N.name}</b><small>${sub}</small></span>
+    ${el.disabled ? '' : '<svg class="go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'}`;
+  el.onclick = () => showIsle(N.id);
 }
 
 function drawIsle(id, lv){

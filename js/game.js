@@ -24,7 +24,9 @@ const ICONS = {
   filter: c => `<svg class="icon" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="7" fill="${COL[c]}" fill-opacity=".38" stroke="${COL[c]}" stroke-width="2.5"/><path d="M14 15l6-3" stroke="#fff9" stroke-width="2" stroke-linecap="round"/></svg>`,
   boat: c => `<svg class="icon" viewBox="0 0 40 40"><path d="M7 25h26l-4 7H11z" fill="#c9d4e3"/><path class="sail" d="M20 6v17H10z" fill="${c?COL[c]:'#e9eff7'}"/><path d="M21 9v14h8z" fill="#8ea3bf"/><path d="M5 34c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 6 2" stroke="#8ea3bf55" stroke-width="1.5" fill="none"/></svg>`,
   cave: () => `<svg class="icon" viewBox="0 0 40 40"><path d="M4 34C4 17 10 7 20 7s16 10 16 27z" fill="#34404f"/><path d="M9 30C10 19 14 12 20 11" stroke="#4a5768" stroke-width="2" fill="none" stroke-linecap="round"/><path class="mouth" d="M12 34c0-9 3.5-15 8-15s8 6 8 15z" fill="#07101d"/></svg>`,
-  prism: () => `<svg class="icon" viewBox="0 0 40 40"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bfe9ff"/><stop offset="1" stop-color="#5aa7ff"/></linearGradient></defs><path d="M20 7l13 23H7z" fill="url(#pg)" opacity=".9"/><path d="M20 7l-4 23" stroke="#fff8" stroke-width="1"/></svg>`
+  // svaka prizma ima svoj prijelaz boja, jer skrivena kopija (npr. u zatvorenom prozoru) ne smije pokvariti ostale
+  prism: () => { const g = 'pg' + (++ICONS.n); return `<svg class="icon" viewBox="0 0 40 40"><defs><linearGradient id="${g}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bfe9ff"/><stop offset="1" stop-color="#5aa7ff"/></linearGradient></defs><path d="M20 7l13 23H7z" fill="url(#${g})" opacity=".9"/><path d="M20 7l-4 23" stroke="#fff8" stroke-width="1"/></svg>`; },
+  n: 0
 };
 
 // Ćelija je na ploči ako je unutar mreže i, kad razina ima obris (shape), nije označena s '.'

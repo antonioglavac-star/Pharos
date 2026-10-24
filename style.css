@@ -159,7 +159,9 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .rules i .fog-chip{width:100%;height:100%;border-radius:8px;background:radial-gradient(60% 45% at 30% 35%,#c9d4e3b3,#c9d4e300 70%),radial-gradient(55% 50% at 72% 62%,#a9bbd1a6,#a9bbd100 70%),#8ea3bf59}
 .rules i .mirror{width:80%;height:13%}
 .titlebar{display:flex;align-items:flex-end;gap:10px}
-.back{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--foam);font-size:18px;cursor:pointer;flex:none}
+.back{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--foam);cursor:pointer;flex:none;padding:0;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+.back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.back:hover{border-color:var(--muted)}
 .back:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
 .chart{border-radius:14px;overflow:hidden;background:var(--sea);box-shadow:0 0 0 1px var(--line), 0 20px 50px #0008}
 .chart svg{display:block;width:100%;height:auto}
@@ -170,7 +172,8 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .rose path{fill:none;stroke:var(--sand-dim);stroke-width:.8}
 .rose text{fill:var(--sand-dim);font:700 9px var(--body);text-anchor:middle}
 .isle{cursor:pointer;outline:none}
-.isle .hit{fill:transparent}
+.isle .hit{fill:transparent;stroke:transparent;stroke-width:7;stroke-linejoin:round}
+.isle .land,.isle .contour,.isle .lamp{pointer-events:none}
 .isle .contour{fill:none;stroke:var(--sand-dim);stroke-width:.7;stroke-dasharray:2 3;stroke-linejoin:round}
 .isle .land{fill:var(--sea-2);stroke:var(--sand);stroke-width:.9;stroke-linejoin:round}
 .isle text{fill:var(--sand);font:700 10px var(--body);text-anchor:middle;letter-spacing:.04em}
@@ -197,6 +200,27 @@ svg.beams{position:absolute;inset:var(--py,0) var(--px,0);width:calc(100% - 2*va
 .mk:focus-visible{outline:2px solid var(--beam);outline-offset:3px}
 @media (prefers-reduced-motion:no-preference){ .mk.cur{animation:beacon 1.8s ease-in-out infinite} }
 @keyframes beacon{50%{box-shadow:0 0 0 8px #ffc35a14}}
+#isleFact{margin:0}
+.fact.locked{border-left-style:dashed;border-left-color:var(--sand-dim);color:var(--muted)}
+.fact.locked b{color:var(--sand)}
+.isle-sec{display:flex;flex-direction:column;gap:10px}
+.mechs{display:flex;flex-wrap:wrap;gap:8px}
+.mech{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--sea-2);border:1px solid var(--line);font-size:14px;color:var(--foam)}
+.mech i{width:28px;height:28px;border-radius:50%;background:var(--cell);display:grid;place-items:center;overflow:hidden;font-style:normal}
+.mech i .icon{width:86%;height:86%}
+.mech i .mirror{width:70%;height:12%}
+.mech i .fog-chip{display:block;width:100%;height:100%;background:radial-gradient(60% 45% at 30% 35%,#c9d4e3b3,#c9d4e300 70%),radial-gradient(55% 50% at 72% 62%,#a9bbd1a6,#a9bbd100 70%),#8ea3bf59}
+.mech b{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--sea);background:var(--beam);border-radius:999px;padding:2px 6px}
+.next-isle{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:14px;border-radius:14px;border:1px solid var(--line);background:var(--sea-2);color:var(--foam);font:inherit;cursor:pointer}
+.next-isle:disabled{cursor:default}
+.next-isle:not(:disabled):hover{border-color:var(--muted)}
+.next-isle:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
+.next-isle>svg:first-child{flex:none;width:64px;height:44px}
+.next-isle>svg:first-child path{fill:var(--sea);stroke:var(--sand);stroke-linejoin:round}
+.next-isle>span{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.next-isle b{font-family:var(--display);font-size:20px;font-weight:800}
+.next-isle small{color:var(--muted);font-size:13px}
+.next-isle .go{flex:none;width:22px;height:22px;fill:none;stroke:var(--beam);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .win-btns{display:flex;flex-direction:column;gap:8px;align-items:center}
 .card{background:var(--sea-2);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .card h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0}

@@ -73,7 +73,7 @@
   <section class="screen" id="map" hidden>
     <header>
       <div class="titlebar">
-        <button class="back" id="toMenu" aria-label="Natrag na izbornik">←</button>
+        <button class="back" id="toMenu" aria-label="Natrag na izbornik"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
         <div>
           <div class="eyebrow">Jadransko more</div>
           <h1>Karta otoka</h1>
@@ -92,7 +92,7 @@
   <section class="screen" id="isle" hidden>
     <header>
       <div class="titlebar">
-        <button class="back" id="isleBack" aria-label="Natrag na kartu">←</button>
+        <button class="back" id="isleBack" aria-label="Natrag na kartu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
         <div>
           <div class="eyebrow">Otok</div>
           <h1 id="isleName">Vis</h1>
@@ -108,13 +108,18 @@
       <div class="isle-marks" id="isleMarks"></div>
     </div>
     <button class="btn primary big" id="islePlay">Igraj 1. razinu</button>
-    <div class="fact" id="isleFact" hidden></div>
+    <div class="fact" id="isleFact"></div>
+    <div class="isle-sec">
+      <div class="eyebrow">Na ovom otoku</div>
+      <div class="mechs" id="isleMechs"></div>
+    </div>
+    <button class="next-isle" id="isleNext" hidden></button>
   </section>
 
   <section class="screen" id="game" hidden>
     <header>
       <div class="titlebar">
-        <button class="back" id="back" aria-label="Natrag na otok">←</button>
+        <button class="back" id="back" aria-label="Natrag na otok"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
         <div>
           <div class="eyebrow" id="island">Otok Vis</div>
           <h1 id="title">Razina 1</h1>

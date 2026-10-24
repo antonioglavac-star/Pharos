@@ -24,11 +24,14 @@ function renderMap(){
   const W = CHART.w, H = CHART.h, lines = [];
   for (let x=55; x<W; x+=110) lines.push(`<line x1="${x}" y1="0" x2="${x}" y2="${H}"/>`);
   for (let y=65; y<H; y+=110) lines.push(`<line x1="0" y1="${y}" x2="${W}" y2="${y}"/>`);
-  const isles = ISLANDS.map((I,i) => {
-    const st = islandStatus(i), [cx, cy, r, hh] = CHART.c[I.id];
-    // Mali otoci (Palagruža, Svetac) dobiju veće nevidljivo polje za dodir
+  // Polje za dodir je sam obris otoka s rubom od par piksela; sitni otoci (Palagruža, Svetac, Biševo)
+  // dobiju i mali krug. Veliki otoci se crtaju prvi, a mali iznad njih, da im nitko ne "ukrade" dodir.
+  const order = ISLANDS.map((I,i) => i).sort((a, b) => CHART.c[ISLANDS[b].id][2] - CHART.c[ISLANDS[a].id][2]);
+  const isles = order.map(i => {
+    const I = ISLANDS[i], st = islandStatus(i), [cx, cy, r, hh] = CHART.c[I.id];
     return `<g class="isle ${st} ${I.id===sel?'sel':''}" data-id="${I.id}" tabindex="0" role="button" aria-label="${I.name}, ${STATUS_LABEL[st]}">
-      <circle class="hit" cx="${cx}" cy="${cy}" r="${Math.max(r+6,20)}"/>
+      <path class="hit" d="${CHART.isles[I.id]}"/>
+      ${r < 12 ? `<circle class="hit" cx="${cx}" cy="${cy}" r="13"/>` : ''}
       <path class="contour" d="${CHART.contours[I.id]}"/>
       <path class="land" d="${CHART.isles[I.id]}"/>
       ${st==='open'||st==='done' ? `<circle class="lamp" cx="${cx}" cy="${cy}" r="2.5"/>` : ''}
