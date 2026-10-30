@@ -94,10 +94,12 @@ function showLights(from){
   $('lightsCount').textContent = `${got.length}/${ids.length}`;
   $('lightsGrid').innerHTML = ids.map(id => {
     const H = LIGHTHOUSES[id], open = islandDone(id), I = isleOf(id);
-    return `<button class="lh-card ${open ? '' : 'locked'}" data-id="${id}" ${open ? '' : 'disabled'} aria-label="${open ? H.name : 'Zaključan svjetionik, osvijetli otok ' + I.name}">
+    // Ime otoka smije se vidjeti tek kad je otok izašao iz magle
+    const need = islandStatus(ISLANDS.indexOf(I))==='open' ? 'Osvijetli otok ' + I.name : 'Skriven u magli';
+    return `<button class="lh-card ${open ? '' : 'locked'}" data-id="${id}" ${open ? '' : 'disabled'} aria-label="${open ? H.name : 'Zaključan svjetionik. ' + need}">
       ${lighthouseArt(id)}
       <span class="lh-name">${open ? H.name : '???'}</span>
-      <span class="lh-sub">${open ? 'Otok ' + I.name + ' · ' + H.year + '.' : 'Osvijetli otok ' + I.name}</span>
+      <span class="lh-sub">${open ? 'Otok ' + I.name + ' · ' + H.year + '.' : need}</span>
     </button>`;
   }).join('') + `<div class="lh-more">Novi svjetionici stižu s novim otocima.</div>`;
   $('lightsGrid').querySelectorAll('.lh-card:not(.locked)').forEach(b => b.onclick = () => openLight(b.dataset.id));

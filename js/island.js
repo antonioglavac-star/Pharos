@@ -47,16 +47,22 @@ function renderNextIsle(id){
   const i = ISLANDS.findIndex(I => I.id===id), N = ISLANDS[i+1], el = $('isleNext');
   el.hidden = !N;
   if (!N) return;
-  const st = islandStatus(i+1), nums = CHART.detail[N.id].match(/-?\d+\.?\d*/g).map(Number);
+  const st = islandStatus(i+1);
+  // Otok pod maglom ostaje tajna: bez imena i obrisa
+  if (st==='soon' || st==='locked'){
+    el.disabled = true;
+    el.innerHTML = `<span class="fog-thumb" aria-hidden="true"></span>
+      <span><span class="eyebrow">Sljedeći otok</span><b>Skriven u magli</b><small>${st==='soon' ? 'Stiže uskoro' : `Osvijetli otok ${ISLANDS[i].name} i magla će se podići`}</small></span>`;
+    return;
+  }
+  const nums = CHART.detail[N.id].match(/-?\d+\.?\d*/g).map(Number);
   const xs = nums.filter((_, k) => k%2 === 0), ys = nums.filter((_, k) => k%2), x0 = Math.min(...xs), y0 = Math.min(...ys);
   const w = Math.max(...xs) - x0, h = Math.max(...ys) - y0, p = Math.max(w, h) * .12;
-  const sub = st==='soon' ? 'Uskoro stiže u igru'
-    : st==='locked' ? `Otvara se kad osvijetliš otok ${ISLANDS[i].name}`
-    : st==='done' ? 'Osvijetljen' : 'Otvoren';
-  el.disabled = !(st==='open' || st==='done');
+  const sub = st==='done' ? 'Osvijetljen' : 'Otvoren';
+  el.disabled = false;
   el.innerHTML = `<svg viewBox="${x0-p} ${y0-p} ${w+2*p} ${h+2*p}" aria-hidden="true"><path d="${CHART.detail[N.id]}" style="stroke-width:${Math.max(w, h)/40}"/></svg>
     <span><span class="eyebrow">Sljedeći otok</span><b>${N.name}</b><small>${sub}</small></span>
-    ${el.disabled ? '' : '<svg class="go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'}`;
+    <svg class="go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
   el.onclick = () => showIsle(N.id);
 }
 

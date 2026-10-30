@@ -8,7 +8,7 @@ Vlasnik projekta je Antonio, student UX dizajna bez programerske pozadine. Komun
 
 ## Vizija
 
-Igrač se kreće kartom hrvatske obale i otok po otok pali svjetlo duž Jadrana. Otoci se dodaju **postupno, kroz nadogradnje**, a ne svi odjednom. Karta od početka prikazuje i otoke koji tek dolaze („uskoro”). Dugoročno karta može obuhvatiti svih 1000+ otoka: veći otoci imaju ručno složene razine, a manji otočići i hridi mogu dobiti kratke ili automatski složene zagonetke.
+Igrač se kreće kartom hrvatske obale i otok po otok pali svjetlo duž Jadrana. Otoci se dodaju **postupno, kroz nadogradnje**, a ne svi odjednom. Karta je prekrivena maglom rata (dim, `drawFog` u `map.js`): čisto je samo oko otoka do kojih je igrač stigao, a otok pod maglom nigdje ne otkriva ime ni obris. Dugoročno karta može obuhvatiti svih 1000+ otoka: veći otoci imaju ručno složene razine, a manji otočići i hridi mogu dobiti kratke ili automatski složene zagonetke.
 
 Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač riješi sve razine na otoku. **Svaku činjenicu Antonio mora provjeriti prije objave.**
 
@@ -53,7 +53,7 @@ Nema build koraka ni ovisnosti. Igra se pokreće otvaranjem `index.html` u pregl
 3. Dodaj `<script src="js/islands/<id>.js">` u `index.html`, prije `game.js`.
 4. Pokreni `node tools/check-levels.js`.
 
-Otok bez razina na karti piše „uskoro”. Otok s razinama otvara se kad su riješeni svi prethodni otoci koji imaju razine.
+Otok bez razina ostaje pod maglom. Otok s razinama otvara se kad su riješeni svi prethodni otoci koji imaju razine.
 
 ## Format razine
 

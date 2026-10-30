@@ -205,7 +205,14 @@ html,body{overflow-x:clip}
 .back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .back:hover{border-color:var(--muted)}
 .back:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
-.chart{border-radius:14px;overflow:hidden;background:var(--sea);box-shadow:0 0 0 1px var(--line), 0 20px 50px #0008}
+.chart{position:relative;border-radius:14px;overflow:hidden;background:var(--sea);box-shadow:0 0 0 1px var(--line), 0 20px 50px #0008}
+/* Oblaci magle rata i sloj iznad njih ne hvataju dodire: dodir prolazi do otkrivenih otoka */
+#fogMap,.chart #chartTop{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ghost{fill:var(--sea-2);stroke:var(--sand-dim);stroke-width:.6;stroke-linejoin:round;pointer-events:none}
+#chartTop .rose path{stroke:#0a1729b3;stroke-width:1}
+#chartTop .rose text{fill:#0a1729cc}
+#chartTop .osm-bg{fill:#0a1729cc}
+#chartTop .osm{fill:var(--sand)}
 .chart svg{display:block;width:100%;height:auto}
 .grat line{stroke:var(--line);stroke-width:.6}
 #hatch line{stroke:var(--sand-dim);stroke-width:.7}
@@ -219,19 +226,11 @@ html,body{overflow-x:clip}
 .isle .contour{fill:none;stroke:var(--sand-dim);stroke-width:.7;stroke-dasharray:2 3;stroke-linejoin:round}
 .isle .land{fill:var(--sea-2);stroke:var(--sand);stroke-width:.9;stroke-linejoin:round}
 .isle text{fill:var(--sand);font:700 10px var(--body);text-anchor:middle;letter-spacing:.04em}
-/* Magla rata: neotkriveni otoci su tamni i pod maglom s lokotom; osvijetljeni svijetle zlatno */
-.isle.soon .land,.isle.locked .land{fill:#081322;stroke:#e6d6b02e}
-.isle.soon .contour,.isle.locked .contour{stroke:#e6d6b01a}
-.isle.soon text,.isle.locked text{fill:#e6d6b052}
-.isle .fogcover{fill:#a9bbd1;fill-opacity:.2;stroke:#a9bbd1;stroke-opacity:.22;stroke-width:9;stroke-linejoin:round;pointer-events:none}
-.isle .lock{fill:none;stroke:#e6d6b0a0;stroke-width:1.1;stroke-linecap:round;pointer-events:none}
-.isle .lock rect{fill:#081322}
+/* Osvijetljeni otoci trajno svijetle zlatno */
 .isle.done .land{fill:#ffc35a40;stroke:var(--beam);filter:drop-shadow(0 0 3px #ffc35acc) drop-shadow(0 0 8px #ffc35a66)}
 .isle.done .contour{stroke:#ffc35a80}
 .isle.done text{fill:var(--beam)}
 .isle.done .lamp{filter:drop-shadow(0 0 6px var(--beam)) drop-shadow(0 0 12px var(--beam))}
-@media (prefers-reduced-motion:no-preference){ .isle .fogcover{animation:fogDrift 6s ease-in-out infinite alternate} }
-@keyframes fogDrift{to{fill-opacity:.28;stroke-opacity:.14}}
 .isle .lamp{fill:var(--beam);filter:drop-shadow(0 0 4px var(--beam))}
 .isle.sel .contour,.isle:focus-visible .contour{stroke:var(--beam);stroke-width:1.2;stroke-dasharray:none}
 @media (prefers-reduced-motion:no-preference){ .isle.open .lamp{animation:flicker 2.4s ease-in-out infinite} }
@@ -272,7 +271,8 @@ html,body{overflow-x:clip}
 .next-isle:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
 .next-isle>svg:first-child{flex:none;width:64px;height:44px}
 .next-isle>svg:first-child path{fill:var(--sea);stroke:var(--sand);stroke-linejoin:round}
-.next-isle>span{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.next-isle .fog-thumb{flex:none;width:64px;height:44px;border-radius:10px;background:radial-gradient(45% 55% at 30% 40%,#e4e8ec,#e4e8ec00 75%),radial-gradient(50% 60% at 72% 62%,#b6bec7,#b6bec700 75%),radial-gradient(40% 50% at 60% 25%,#58627099,#58627000 75%),#7d8896}
+.next-isle>span:not(.fog-thumb){display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
 .next-isle b{font-family:var(--display);font-size:20px;font-weight:800}
 .next-isle small{color:var(--muted);font-size:13px}
 .next-isle .go{flex:none;width:22px;height:22px;fill:none;stroke:var(--beam);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}

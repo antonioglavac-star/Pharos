@@ -27,38 +27,37 @@ function renderMap(){
   // Polje za dodir je sam obris otoka s rubom od par piksela; sitni otoci (Palagruža, Svetac, Biševo)
   // dobiju i mali krug. Veliki otoci se crtaju prvi, a mali iznad njih, da im nitko ne "ukrade" dodir.
   const order = ISLANDS.map((I,i) => i).sort((a, b) => CHART.c[ISLANDS[b].id][2] - CHART.c[ISLANDS[a].id][2]);
+  // Magla rata: otok pod maglom nema ime ni polje za dodir; ako mu rub virne iz čistine, to je samo obala
+  const shown = i => ['open','done'].includes(islandStatus(i));
   const isles = order.map(i => {
     const I = ISLANDS[i], st = islandStatus(i), [cx, cy, r, hh] = CHART.c[I.id];
-    // Magla rata: zaključani i budući otoci su pod morskom maglom s lokotom; osvijetljeni trajno svijetle zlatno
-    const hidden = st==='soon' || st==='locked';
+    if (!shown(i)) return `<path class="ghost" d="${CHART.isles[I.id]}"/>`;
     return `<g class="isle ${st} ${I.id===sel?'sel':''}" data-id="${I.id}" tabindex="0" role="button" aria-label="${I.name}, ${STATUS_LABEL[st]}">
       <path class="hit" d="${CHART.isles[I.id]}"/>
       ${r < 12 ? `<circle class="hit" cx="${cx}" cy="${cy}" r="13"/>` : ''}
       <path class="contour" d="${CHART.contours[I.id]}"/>
       <path class="land" d="${CHART.isles[I.id]}"/>
-      ${hidden ? `<path class="fogcover" d="${CHART.isles[I.id]}" filter="url(#mistBlur)"/>
-        <g class="lock" transform="translate(${cx} ${cy})"><rect x="-4" y="-1" width="8" height="6" rx="1.2"/><path d="M-2.4-1v-2a2.4 2.4 0 0 1 4.8 0v2"/></g>` : ''}
-      ${st==='open'||st==='done' ? `<circle class="lamp" cx="${cx}" cy="${cy}" r="2.5"/>` : ''}
+      <circle class="lamp" cx="${cx}" cy="${cy}" r="2.5"/>
       <text x="${cx}" y="${hh ? cy+hh+13 : cy+13}">${I.name}</text>
     </g>`;
   }).join('');
   $('chart').setAttribute('viewBox', `0 0 ${W} ${H}`);
   $('chart').innerHTML = `
     <defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <line x1="0" y1="0" x2="0" y2="5"/></pattern>
-      <filter id="mistBlur" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="3"/></filter></defs>
+      <line x1="0" y1="0" x2="0" y2="5"/></pattern></defs>
     <g class="grat">${lines.join('')}</g>
     <path class="coast" d="${CHART.land}"/>
+    ${isles}`;
+  // Iznad oblaka ostaju ruža vjetrova i navođenje izvora karte
+  $('chartTop').setAttribute('viewBox', `0 0 ${W} ${H}`);
+  $('chartTop').innerHTML = `
     <g class="rose" transform="translate(${W-45} ${H-55})">
       <path d="M0-22L4-4L22 0L4 4L0 22L-4 4L-22 0L-4-4Z"/><text y="-27">S</text></g>
-    <text class="osm" x="6" y="${H-6}">© OpenStreetMap</text>
-    ${isles}`;
-  // Dodir na otvoren ili osvijetljen otok otvara kartu otoka; ostali otoci samo pokažu karticu
-  const pick = id => {
-    sel = id;
-    const st = islandStatus(ISLANDS.findIndex(I => I.id===id));
-    if (st==='open' || st==='done') showIsle(id); else renderMap();
-  };
+    <rect class="osm-bg" x="3" y="${H-17}" width="78" height="14" rx="4"/>
+    <text class="osm" x="8" y="${H-7}">© OpenStreetMap</text>`;
+  drawFog(ISLANDS.filter((I,i) => shown(i)).map(I => I.id));
+  // Dodir na otvoren ili osvijetljen otok otvara kartu otoka
+  const pick = id => { sel = id; showIsle(id); };
   $('chart').querySelectorAll('.isle').forEach(g => {
     g.onclick = () => pick(g.dataset.id);
     g.onkeydown = e => { if (e.key==='Enter'||e.key===' '){ e.preventDefault(); pick(g.dataset.id); } };
@@ -74,16 +73,71 @@ function renderMap(){
   renderCard();
 }
 
+// Magla rata: dim preko cijele karte, s čistinom oko svakog otkrivenog otoka. Dim je šum izračunat za svaku
+// točku (uvijek isti, pa ne skače), a rub čistine je mekan i neravan. Crta se samo kad se otkrije novi otok.
+let fogKey = null, fogCloud = null;
+const FOG_W = 308, FOG_H = Math.round(FOG_W * CHART.h / CHART.w);
+
+// Glatki šum: nasumična mreža, uzorkovana na više razmjera
+const fogTable = (() => { let s = 7; return Float32Array.from({ length: 65536 }, () => (s = (s*16807) % 2147483647) / 2147483647); })();
+function fogNoise(x, y){
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x-xi, yf = y-yi;
+  const u = xf*xf*(3-2*xf), v = yf*yf*(3-2*yf), at = (a, b) => fogTable[((a & 255) << 8) | (b & 255)];
+  const top = at(xi, yi)*(1-u) + at(xi+1, yi)*u, low = at(xi, yi+1)*(1-u) + at(xi+1, yi+1)*u;
+  return top*(1-v) + low*v;
+}
+function fogFbm(x, y){
+  let sum = 0, amp = .5;
+  for (let o = 0; o < 5; o++){ sum += amp*fogNoise(x, y); x = x*2 + 13.7; y = y*2 + 7.3; amp /= 2; }
+  return sum / .97;
+}
+
+function drawFog(ids){
+  const key = ids.join(), cv = $('fogMap');
+  if (key === fogKey) return;
+  fogKey = key;
+  cv.width = FOG_W; cv.height = FOG_H;
+  const ctx = cv.getContext('2d'), img = ctx.createImageData(FOG_W, FOG_H), k = CHART.w / FOG_W;
+
+  // Dim: svijetli i tamni pramenovi; šum je iskrivljen samim sobom, pa izgleda kao kovitlac dima
+  if (!fogCloud){
+    fogCloud = new Uint8Array(FOG_W*FOG_H*2);
+    for (let y = 0, p = 0; y < FOG_H; y++) for (let x = 0; x < FOG_W; x++, p += 2){
+      const u = x*k/110, v = y*k/110;
+      const n = fogFbm(u + .7*fogFbm(u + 1.7, v + 9.2), v + .7*fogFbm(u + 8.3, v + 2.8));
+      const t = Math.min(1, Math.max(0, (n-.3)/.42));
+      fogCloud[p] = 104 + 108*t*t*(3-2*t);
+      fogCloud[p+1] = 255*(fogFbm(x*k/24 + 50, y*k/24 + 50));
+    }
+  }
+
+  // Točke oko kojih je čisto: obala svakog otkrivenog otoka, njegovo središte i mjesto za ime
+  const pts = [];
+  for (const id of ids){
+    const n = CHART.isles[id].match(/-?\d+\.?\d*/g).map(Number), step = Math.max(1, Math.floor(n.length/2/24));
+    for (let i = 0; i < n.length-1; i += 2*step) pts.push(n[i], n[i+1]);
+    const [cx, cy, , hh] = CHART.c[id];
+    pts.push(cx, cy, cx, hh ? cy+hh+10 : cy+10);
+  }
+  for (let y = 0, p = 0, c = 0; y < FOG_H; y++) for (let x = 0; x < FOG_W; x++, p += 4, c += 2){
+    let min = Infinity;
+    for (let i = 0; i < pts.length; i += 2){ const dx = x*k-pts[i], dy = y*k-pts[i+1], d = dx*dx + dy*dy; if (d < min) min = d; }
+    // Rub: od 14 do 36 jedinica od obale, a sitniji šum ga čini neravnim
+    const edge = (Math.sqrt(min) + (fogCloud[c+1]/255 - .5)*34 - 14) / 22, a = Math.min(1, Math.max(0, edge));
+    const g = fogCloud[c];
+    img.data[p] = g-4; img.data[p+1] = g; img.data[p+2] = g+6;
+    img.data[p+3] = 255 * a*a*(3-2*a);
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
 function renderCard(){
   const i = ISLANDS.findIndex(I => I.id===sel), I = ISLANDS[i], st = islandStatus(i);
   const lv = LEVELS[I.id] || [], solved = lv.filter(L => progress[L.id]).length;
-  const eyebrow = st==='soon' ? 'Uskoro' : `${solved} / ${lv.length} razina`;
   const text = st==='done' ? (I.fact ? `<div class="fact"><b>Zanimljivost</b>${I.fact}</div>` : '<p>Otok je osvijetljen.</p>')
-    : st==='open' ? '<p>Osvijetli sve razine i otkrij priču otoka.</p>'
-    : st==='locked' ? '<p>Najprije osvijetli prethodni otok.</p>'
-    : '<p>Svjetionik na ovom otoku još čeka čuvara. Novi otoci stižu uskoro.</p>';
-  const btn = st==='open' ? (solved ? 'Nastavi' : 'Igraj') : st==='done' ? 'Otvori otok' : '';
-  $('card').innerHTML = `<div class="eyebrow">${eyebrow}</div><h2>${I.name}</h2>${text}
-    ${btn ? `<button class="btn primary" id="cardBtn">${btn}</button>` : ''}`;
-  if (btn) $('cardBtn').onclick = () => showIsle(I.id);
+    : '<p>Osvijetli sve razine i otkrij priču otoka.</p>';
+  const btn = st==='open' ? (solved ? 'Nastavi' : 'Igraj') : 'Otvori otok';
+  $('card').innerHTML = `<div class="eyebrow">${solved} / ${lv.length} razina</div><h2>${I.name}</h2>${text}
+    <button class="btn primary" id="cardBtn">${btn}</button>`;
+  $('cardBtn').onclick = () => showIsle(I.id);
 }
