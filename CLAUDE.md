@@ -8,13 +8,13 @@ Vlasnik projekta je Antonio, student UX dizajna bez programerske pozadine. Komun
 
 ## Vizija
 
-Igrač se kreće kartom hrvatske obale i otok po otok pali svjetlo duž Jadrana. Otoci se dodaju **postupno, kroz nadogradnje**, a ne svi odjednom. Karta je prekrivena maglom rata (dim, `drawFog` u `map.js`): čisto je samo oko otoka do kojih je igrač stigao, a otok pod maglom nigdje ne otkriva ime ni obris. Dugoročno karta može obuhvatiti svih 1000+ otoka: veći otoci imaju ručno složene razine, a manji otočići i hridi mogu dobiti kratke ili automatski složene zagonetke.
+Igrač se kreće kartom hrvatske obale i otok po otok pali svjetlo duž Jadrana. Otoci se dodaju **postupno, kroz nadogradnje**, a ne svi odjednom. Magla rata (`drawFog` u `map.js`): nad svakim otokom do kojeg igrač još nije stigao stoji oblak dima, a more, kopno i otkriveni otoci ostaju vidljivi. Otok pod maglom nigdje ne otkriva ime ni obris. Dugoročno karta može obuhvatiti svih 1000+ otoka: veći otoci imaju ručno složene razine, a manji otočići i hridi mogu dobiti kratke ili automatski složene zagonetke.
 
 Svaki otok ima zanimljivost ili legendu (`fact`) koja se otkrije kad igrač riješi sve razine na otoku. **Svaku činjenicu Antonio mora provjeriti prije objave.**
 
 ## Monetizacija (Antonijeva odluka)
 
-Otoci se **ne kupuju**: otključavaju se samo igranjem. Zarada ide preko **reklama**. Prirodno mjesto za dobrovoljnu reklamu je pomoć „Pokaži potez” (reklama za pomoć), a reklame se ne smiju ubacivati usred igre ni između razina bez igračeva izbora. Reklame još nisu ugrađene.
+Otoci se **ne kupuju**: otključavaju se samo igranjem. Zarada ide preko **reklama**. Prirodno mjesto za dobrovoljnu reklamu je pomoć „Pokaži potez” (reklama za pomoć), a reklame se ne smiju ubacivati usred igre ni između razina bez igračeva izbora. Igrač može kupiti paket **„Ukloni reklame”**, koji uključuje i kalendar propuštenih dnevnih razina (vidi Backlog). Reklame i kupnja još nisu ugrađene.
 
 ## Kolekcija svjetionika
 
@@ -97,6 +97,24 @@ Pomoć „Pokaži potez” (`findHint` u `game.js`) iz trenutnog stanja traži n
 5. ~~Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora)~~ (gotovo za srednju i južnu Dalmaciju); još treba karta s pomicanjem i zumiranjem za cijelu obalu
 6. ~~Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija~~ (gotovo, uz postavke u izborniku)
 7. ~~UX dokumentacija: persona, user flow, wireframeovi (za portfolio)~~ – prva verzija u `docs/ux-dokumentacija.html`, objavljena kao privatni Artifact https://claude.ai/artifact/FFTMmc5qHkrUmeaW5Z4o17 (dopunjavati nakon novih testova)
+
+## Backlog
+
+### Dnevna razina (Antonijeva odluka, još nije ugrađeno)
+
+- **Svima ista:** svaki dan svi igrači dobiju istu razinu i mogu se uspoređivati.
+- **Dostupnost:** otvara se tek kad igrač odigra prvi otok (Vis).
+- **Bez kazne:** propušten dan nema nikakvih posljedica; nema niza dana koji se može prekinuti.
+- **Kalendar:** kao u igrama New York Timesa, igrač se može vratiti na propuštene dane i odigrati te razine. To je uključeno u paket koji igrač dobije kupnjom „Ukloni reklame”.
+- **Bez utjecaja na otoke:** dnevna razina ne utječe na otključavanje otoka.
+- **Nagrada:** mora postojati, npr. dio svjetionika.
+
+Još treba odlučiti:
+- Kako se igrači uspoređuju: dijeljenjem rezultata (radi bez poslužitelja) ili ljestvicom (traži poslužitelj).
+- Što se skuplja iz dijelova: posebni svjetionici ili dio postojeće kolekcije, i koliko dijelova čini jedan svjetionik.
+- Kada počinje novi dan: isti trenutak za sve ili ponoć po satu igrača.
+- Koje mehanike dnevna razina smije koristiti, s obzirom na to da je igrač možda vidio samo Vis.
+- Kupnja „Ukloni reklame” traži objavu u trgovinama aplikacija ili drugi način naplate; igra je zasad samo web stranica.
 
 ## Smjernice
 

@@ -209,8 +209,6 @@ html,body{overflow-x:clip}
 /* Oblaci magle rata i sloj iznad njih ne hvataju dodire: dodir prolazi do otkrivenih otoka */
 #fogMap,.chart #chartTop{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .ghost{fill:var(--sea-2);stroke:var(--sand-dim);stroke-width:.6;stroke-linejoin:round;pointer-events:none}
-#chartTop .rose path{stroke:#0a1729b3;stroke-width:1}
-#chartTop .rose text{fill:#0a1729cc}
 #chartTop .osm-bg{fill:#0a1729cc}
 #chartTop .osm{fill:var(--sand)}
 .chart svg{display:block;width:100%;height:auto}
