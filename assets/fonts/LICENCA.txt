@@ -1,0 +1,13 @@
+Fontovi u ovoj mapi preuzeti su s Google Fontsa i objavljeni su pod licencom
+SIL Open Font License 1.1 (https://openfontlicense.org), koja dopušta
+korištenje i dijeljenje uz igru.
+
+Atkinson Hyperlegible
+  Copyright 2020 Braille Institute of America, Inc.
+  https://fonts.google.com/specimen/Atkinson+Hyperlegible
+
+Bricolage Grotesque
+  Copyright 2022 The Bricolage Grotesque Project Authors
+  https://fonts.google.com/specimen/Bricolage+Grotesque
+
+Datoteke "latin" sadrže osnovna slova, a "ext" slova s kvačicama (č, ć, š, ž, đ).

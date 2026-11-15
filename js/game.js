@@ -12,6 +12,9 @@ function saveStars(id, s){
   progress[id] = Math.max(progress[id]||0, s);
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {}
 }
+// Statistika (GoatCounter, učitava se u index.html): bilježi događaj bez osobnih podataka.
+// Ako skripta nije učitana (nema mreže, blokirana je), ne radi ništa.
+const track = name => { try { if (window.goatcounter && goatcounter.count) goatcounter.count({ path: name, title: name, event: true }); } catch (e) {} };
 const islandDone = id => !!LEVELS[id] && LEVELS[id].every(L => progress[L.id]);
 // Zlatni svjetionik: sve tri zvjezdice na svakoj razini otoka
 const islandGold = id => !!LEVELS[id] && LEVELS[id].every(L => progress[L.id]===3);
@@ -304,6 +307,7 @@ $('helpBtn').onclick = () => {
     cellEl(k).classList.add('hinted');
     $('hint').textContent = 'Okreni označeno ogledalo.';
     useHelp(); drawHelp();
+    track('pomoc/' + LV[li].id);
   } else {
     $('hint').textContent = 'Potrebno ogledalo skriva se u magli. Usmjeri zraku u maglu da ga otkriješ.';
   }
@@ -315,10 +319,13 @@ setInterval(() => { if (!$('game').hidden) drawHelp(); }, 30000);
 function showWin(){
   const L = LV[li], wasDone = islandDone(isl.id), wasGold = islandGold(isl.id);
   const s = moves<=L.par ? 3 : moves<=L.par+2 ? 2 : 1;
+  // Prvo rješenje razine ide u statistiku: po tome se vidi do koje razine igrači stižu
+  if (!progress[L.id]) track('rijeseno/' + L.id);
   saveStars(L.id, s);
   drawHelp();
   const justLit = !wasDone && islandDone(isl.id);
   toIsle = li===LV.length-1;
+  if (justLit) track('otok/' + isl.id);
   litNow = justLit ? isl.id : null;   // upravo osvijetljen otok: sljedeći korak je proslava na karti
   $('winTitle').textContent = justLit ? `Otok ${isl.name} je osvijetljen` : 'Svi brodovi su u luci';
   $('stars').innerHTML = [1,2,3].map(i=>`<span class="${i<=s?'':'off'}">★</span>`).join('');

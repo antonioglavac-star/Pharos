@@ -8,8 +8,17 @@
 <link rel="icon" type="image/png" href="assets/icon-48.png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<!-- Opis i slika koje se vide kad netko podijeli link (WhatsApp, Viber, društvene mreže) -->
+<meta name="description" content="Opuštajuća logička igra: kao čuvar svjetionika vodiš zraku svjetla do brodova i otok po otok pališ svjetla Jadrana.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pharos: upali svjetla Jadrana">
+<meta property="og:description" content="Opuštajuća logička igra. Okreći ogledala, vodi zraku do brodova i otok po otok osvijetli Jadran.">
+<meta property="og:url" content="https://antonioglavac-star.github.io/Pharos/">
+<meta property="og:image" content="https://antonioglavac-star.github.io/Pharos/assets/share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="hr_HR">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,7 +32,7 @@
     <div class="logo-wrap">
       <div class="sweep" aria-hidden="true"></div>
       <div class="lamp" aria-hidden="true"></div>
-      <img class="logo" src="assets/logo.png" alt="Pharos" width="951" height="425">
+      <img class="logo" src="assets/logo.webp" alt="Pharos" width="760" height="340">
     </div>
     <p class="tagline">Upali svjetla Jadrana, otok po otok.</p>
     <nav class="menu">
@@ -117,6 +126,7 @@
   <p>Ime dolazi od grčkog naziva za Hvar i riječi za svjetionik.</p>
   <p class="credit">Ideja i dizajn: Antonio Glavač</p>
   <p>Obrisi obale i otoka: © OpenStreetMap contributors (ODbL).</p>
+  <p>Igra broji posjete i riješene razine, bez kolačića i bez osobnih podataka (GoatCounter).</p>
   <form method="dialog"><button class="btn primary">Zatvori</button></form>
 </dialog>
 
@@ -251,5 +261,7 @@
 <script src="js/lighthouses.js"></script>
 <script src="js/menu.js"></script>
 <script src="js/app.js"></script>
+<!-- Statistika posjeta (GoatCounter): bez kolačića i osobnih podataka. Pregled: https://pharos.goatcounter.com -->
+<script data-goatcounter="https://pharos.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

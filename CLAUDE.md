@@ -36,7 +36,7 @@ Kad igrač osvijetli otok, dobije jedan **stvarni** svjetionik (`js/lighthouses.
 - `js/app.js` – ponašanje kao aplikacija: tipka „natrag” na Androidu (prozor → razina → otok → karta → izbornik), rad bez interneta, gumb „Dodaj na početni zaslon” i kôd napretka u Postavkama (oblik `PH1.vis-3323.bisevo-33…`, znamenka po broju iz ID-a razine)
 - `sw.js` – rad bez interneta: s mrežom uvijek svježa verzija, bez mreže spremljena kopija. Popis datoteka ne postoji; kopiju puni `app.js` onim što je stranica učitala
 - `js/chart.js` – obrisi obale i otoka prema OpenStreetMapu (stvara ga `tools/build-chart.js`, ne mijenjati ručno; upute su na vrhu alata). Navođenje izvora „© OpenStreetMap” mora ostati na karti i u „O igri”
-- `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.png` (prozirna pozadina) i `icon-*.png` su pripremljene verzije za igru
+- `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.webp` (prozirna pozadina, 760 px), `icon-*.png` i `share.jpg` (slika 1200×630 koja se vidi kad netko podijeli link; adresa je upisana u `index.html`) su pripremljene verzije za igru. `assets/fonts/` su fontovi igre (bez Google Fontsa; `@font-face` je na vrhu `style.css`)
 - `docs/testiranje.md` – bilješke s testiranja s igračima (za portfolio)
 - `manifest.webmanifest` – ime i ikona kad se igra doda na početni zaslon mobitela
 - `tools/check-levels.js` – provjerava da je svaka razina rješiva, da je `par` točan i da se ID-jevi ne ponavljaju
@@ -57,6 +57,10 @@ Nema build koraka ni ovisnosti. Igra se pokreće otvaranjem `index.html` u pregl
 - Boje imaju i znak: crvena je romb, plava krug, isti na filteru i na jedru (`ICONS.mark` u `engine.js`). Novu boju treba dodati i tamo.
 - Položen mobitel dobije poruku da ga treba uspraviti; ploča nikad nije viša od zaslona.
 - Kad su svi otoci osvijetljeni, karta pokaže završnu karticu (`renderEnd`): lov na zvjezdice i „Podijeli igru”. Brojači otoka broje samo otoke koji imaju razine.
+
+## Statistika
+
+GoatCounter, pregled na https://pharos.goatcounter.com (Antonijev račun). Bez kolačića i osobnih podataka; skripta je na dnu `index.html`. Osim posjeta bilježe se događaji (`track` u `game.js`): `rijeseno/<id razine>` pri prvom rješenju, `otok/<id>` kad je otok osvijetljen i `pomoc/<id razine>` kad igrač potroši pomoć. Po tome se vidi gdje igrači odustaju i gdje zapinju.
 
 ## Objava
 
