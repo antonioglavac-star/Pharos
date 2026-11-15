@@ -18,7 +18,7 @@ Otoci se **ne kupuju**: otključavaju se samo igranjem. Zarada ide preko **rekla
 
 ## Kolekcija svjetionika
 
-Kad igrač osvijetli otok, dobije jedan **stvarni** svjetionik (`js/lighthouses.js`, ekran `#lights`). Podaci su s Plovputovih stranica, a crteži prema njihovim fotografijama. Otoci bez klasičnog svjetionika dobiju najbliži ili istoimeni, uz iskrenu napomenu: Biševo → Host (ulaz u luku Vis), Svetac → Sveti Andrija kod Dubrovnika (isto ime). Za novi otok dodaj zapis u `LIGHTHOUSES` s istim ključem kao otok.
+Kad igrač osvijetli otok, dobije jedan **stvarni** svjetionik (`js/lighthouses.js`, ekran `#lights`). Podaci su s Plovputovih stranica, a crteži prema njihovim fotografijama. Otoci bez klasičnog svjetionika dobiju najbliži ili istoimeni, uz iskrenu napomenu: Biševo → Host (ulaz u luku Vis), Svetac → Sveti Andrija kod Dubrovnika (isto ime). Lastovo ima svoj svjetionik Struga. Za novi otok dodaj zapis u `LIGHTHOUSES` s istim ključem kao otok.
 
 ## Struktura
 
@@ -28,17 +28,28 @@ Kad igrač osvijetli otok, dobije jedan **stvarni** svjetionik (`js/lighthouses.
 - `style.css` – izgled (boje su tokeni u `:root`)
 - `js/islands.js` – popis otoka redom otključavanja (`ISLANDS`), boje zraka (`COL`) i prazni `LEVELS`
 - `js/islands/<otok>.js` – razine jednog otoka, npr. `js/islands/vis.js` puni `LEVELS.vis`
-- `js/game.js` – logika igre: crtanje mreže, okretanje ogledala, praćenje zrake, pobjeda, spremanje napretka
+- `js/engine.js` – pravila igre koja dijele igra, provjera razina i uređivač: praćenje zrake, traženje najkraćeg rješenja (`solveMin`, `solveTide`), provjera razine (`checkLevel`), crtanje obale (`coastPath`)
+- `js/game.js` – igra na ekranu: crtanje mreže, okretanje ogledala, pobjeda, spremanje napretka
 - `js/map.js` – karta otoka i kartica odabranog otoka; dodir na otvoren otok otvara ekran otoka
 - `js/lighthouses.js` – kolekcija svjetionika (`LIGHTHOUSES`, crteži, ekran `#lights` i prozor `#lightDlg`)
 - `js/island.js` – ekran otoka (`#isle`): obris otoka i staza razina oko obale; dodir na razinu je pokreće. Razine su jednako razmaknute po glatkoj liniji oko otoka, počevši od najzapadnije točke
+- `js/app.js` – ponašanje kao aplikacija: tipka „natrag” na Androidu (prozor → razina → otok → karta → izbornik), rad bez interneta, gumb „Dodaj na početni zaslon” i kôd napretka u Postavkama (oblik `PH1.vis-3323.bisevo-33…`, znamenka po broju iz ID-a razine)
+- `sw.js` – rad bez interneta: s mrežom uvijek svježa verzija, bez mreže spremljena kopija. Popis datoteka ne postoji; kopiju puni `app.js` onim što je stranica učitala
 - `js/chart.js` – obrisi obale i otoka prema OpenStreetMapu (stvara ga `tools/build-chart.js`, ne mijenjati ručno; upute su na vrhu alata). Navođenje izvora „© OpenStreetMap” mora ostati na karti i u „O igri”
 - `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.png` (prozirna pozadina) i `icon-*.png` su pripremljene verzije za igru
 - `docs/testiranje.md` – bilješke s testiranja s igračima (za portfolio)
 - `manifest.webmanifest` – ime i ikona kad se igra doda na početni zaslon mobitela
 - `tools/check-levels.js` – provjerava da je svaka razina rješiva, da je `par` točan i da se ID-jevi ne ponavljaju
+- `tools/urednik.html` i `tools/urednik.js` – Antonijev uređivač razina: slaganje dodirom, isprobavanje, cilj se računa sam, sprema u `js/islands/<id>.js` (Chrome ili Edge; drugi preglednici preuzmu datoteku). Pamti `LEVELS.<otok>.lastId` da se ID izbrisane razine ne koristi ponovo
 
 Nema build koraka ni ovisnosti. Igra se pokreće otvaranjem `index.html` u pregledniku.
+
+## Tijek igre
+
+- „Igraj” i „Nastavi” vode ravno u razinu na kojoj je igrač stao (`nextSpot` u `game.js`); karta se otvara gumbom „Karta otoka” ili kad je sve riješeno.
+- U prvoj razini nema prozora s uputom: ogledalo samo pulsira. Ostali predmeti i dalje dobiju prozor (`TIPS`).
+- Kad igrač osvijetli otok, gumb „Na kartu” otvara proslavu (`showMap(lit)`): svjetionik bljesne, magla se digne sa sljedećeg otoka i kartica nudi „Otplovi na otok …”. Na osvijetljenom otoku glavni gumb vodi na otok koji čeka.
+- Kad su svi otoci osvijetljeni, karta pokaže završnu karticu (`renderEnd`): lov na zvjezdice i „Podijeli igru”. Brojači otoka broje samo otoke koji imaju razine.
 
 ## Objava
 
@@ -50,8 +61,10 @@ Nema build koraka ni ovisnosti. Igra se pokreće otvaranjem `index.html` u pregl
 
 1. U `js/islands.js` otok već postoji u `ISLANDS` (ili ga dodaj na pravo mjesto u redoslijedu) i upiši `fact`.
 2. Napravi `js/islands/<id>.js` s `LEVELS.<id> = [ … ]`.
-3. Dodaj `<script src="js/islands/<id>.js">` u `index.html`, prije `game.js`.
+3. Dodaj `<script src="js/islands/<id>.js">` u `index.html`, prije `engine.js`.
 4. Pokreni `node tools/check-levels.js`.
+
+Uređivač (`tools/urednik.html`) sam radi 2. i 3. korak.
 
 Otok bez razina ostaje pod maglom. Otok s razinama otvara se kad su riješeni svi prethodni otoci koji imaju razine.
 
@@ -73,6 +86,10 @@ shape:['..xxx.',
 
 Neobavezno polje `fog` (od Sveca) prekriva polja maglom: isti oblik kao `shape`, `'m'` je magla, `'.'` je vidljivo. Polje pod maglom otkrije se kad zraka uđe u njega i ostaje otkriveno do kraja pokušaja; skriveno ogledalo ne može se okretati. Svjetionik i brodovi ne smiju biti u magli. Alat provjerava i da se najkraće rješenje može odigrati redom otkrivanja.
 
+Neobavezno polje `light2` (od Lastova) dodaje drugi svjetionik, u istom obliku kao `light`. Svi brodovi računaju se zajedno, a zrake se mogu križati.
+
+Težina na novom otoku (Antonijeva odluka): samo je prva razina lagana i uvodna, a zatim težina raste do posljednje razine, kojoj je najkraće rješenje 15 poteza.
+
 Oznake ćelija:
 - `/` i `\` – ogledalo (igrač ga okreće dodirom)
 - `#` – stijena (blokira zraku)
@@ -93,7 +110,7 @@ Pomoć „Pokaži potez” (`findHint` u `game.js`) iz trenutnog stanja traži n
 1. ~~Filteri boja~~ (gotovo)
 2. ~~Otoci kao zasebne datoteke, spremanje napretka, probna karta~~ (gotovo)
 3. Dovršiti otok Vis do 15–20 razina s postupnim rastom težine (16 razina složeno, čeka igranje i dotjerivanje)
-4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; ~~Svetac~~ – 12 razina, magla; ~~Sušac~~ – 12 razina, plima i oseka; Lastovo, Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće, plima, magla, dva svjetionika)
+4. Novi otoci jedan po jedan (~~Biševo~~ – 12 razina, Modra špilja; ~~Svetac~~ – 12 razina, magla; ~~Sušac~~ – 12 razina, plima i oseka; ~~Lastovo~~ – 14 razina, dva svjetionika, čeka igranje; Palagruža…), uz nove mehanike s vremenom (npr. brod koji se kreće)
 5. ~~Pravi obrisi otoka (OpenStreetMap, uz navođenje izvora)~~ (gotovo za srednju i južnu Dalmaciju); još treba karta s pomicanjem i zumiranjem za cijelu obalu
 6. ~~Osjećaj igre: zvuk valova, animacija broda koji uplovljava, vibracija~~ (gotovo, uz postavke u izborniku)
 7. ~~UX dokumentacija: persona, user flow, wireframeovi (za portfolio)~~ – prva verzija u `docs/ux-dokumentacija.html`, objavljena kao privatni Artifact https://claude.ai/artifact/FFTMmc5qHkrUmeaW5Z4o17 (dopunjavati nakon novih testova)

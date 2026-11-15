@@ -3,7 +3,7 @@
 let isleId = null;
 
 function showIsle(id){
-  isleId = id;
+  isleId = sel = id;   // i kartica na karti prati otok na kojem je igrač
   const I = ISLANDS.find(x => x.id===id), lv = LEVELS[id];
   ['start','map','game','lights'].forEach(s => $(s).hidden = true);
   $('isle').hidden = false;
@@ -13,8 +13,11 @@ function showIsle(id){
   $('isleCount').textContent = `${solved}/${lv.length}`;
   $('isleStars').textContent = `${stars}/${lv.length*3}`;
   const next = lv.findIndex(L => !progress[L.id]);
-  $('islePlay').textContent = next < 0 ? 'Igraj ponovno od 1. razine' : `Igraj ${next+1}. razinu`;
-  $('islePlay').onclick = () => openIsland(id, next < 0 ? 0 : next);
+  // Na osvijetljenom otoku glavni gumb vodi dalje, na otok koji čeka; stare razine ostaju na stazi
+  const spot = next < 0 ? nextSpot() : null;
+  $('islePlay').textContent = spot ? `Otplovi na otok ${ISLANDS.find(x => x.id===spot.id).name}`
+    : next < 0 ? 'Igraj ponovno od 1. razine' : `Igraj ${next+1}. razinu`;
+  $('islePlay').onclick = () => spot ? showIsle(spot.id) : openIsland(id, next < 0 ? 0 : next);
   // Zanimljivost: otkrivena kad je otok osvijetljen, inače najava nagrade
   const lit = islandDone(id);
   $('isleFact').classList.toggle('locked', !lit);
@@ -52,7 +55,7 @@ function renderNextIsle(id){
   if (st==='soon' || st==='locked'){
     el.disabled = true;
     el.innerHTML = `<span class="fog-thumb" aria-hidden="true"></span>
-      <span><span class="eyebrow">Sljedeći otok</span><b>Skriven u magli</b><small>${st==='soon' ? 'Stiže uskoro' : `Osvijetli otok ${ISLANDS[i].name} i magla će se podići`}</small></span>`;
+      <span><span class="eyebrow">Sljedeći otok</span><b>Skriven u magli</b><small>${st==='soon' ? 'Stiže s idućom nadogradnjom igre' :`Osvijetli otok ${ISLANDS[i].name} i magla će se podići`}</small></span>`;
     return;
   }
   const nums = CHART.detail[N.id].match(/-?\d+\.?\d*/g).map(Number);

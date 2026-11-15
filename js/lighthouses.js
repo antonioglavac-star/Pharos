@@ -76,6 +76,24 @@ const LIGHTHOUSES = {
       <rect x="73" y="9" width="14" height="11" fill="#9fc3df"/><rect x="76" y="11" width="8" height="7" fill="#ffd88a"/>
       <path d="M77.5 9v11M82.5 9v11" stroke="#2b3440" stroke-width=".8"/>
       <path d="M72 9q8-8 16 0z" fill="#f1efe8"/><path d="M80 3V1M78 1.5h4" stroke="#2b3440" stroke-width="1"/>`
+  },
+  lastovo: {
+    name:'Rt Struga', where:'Na sredini južne strane otoka Lastova', year:1839, tower:20, light:104, range:27, crew:true,
+    about:'Okrugla kula od neožbukanog kamena diže se iz sredine bijele prizemne kuće. Svjetlo je 104 metra iznad mora i vidi se do 27 nautičkih milja.',
+    src:'https://www.plovput.hr/pomorska-signalizacija/svjetionici/svjetionik/a/view/id/16',
+    svg:`<path d="M0 104q34-20 80-21q44 1 80 17v20H0z" fill="#7b7366"/>
+      <path d="M16 102q12-8 26-10M122 90q14 3 26 9" stroke="#5f584d" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <rect x="32" y="68" width="96" height="20" fill="#eef0ee"/><rect x="32" y="83" width="96" height="5" fill="#d6d8d4"/>
+      <g fill="#2f5a45"><rect x="42" y="72" width="8" height="11"/><rect x="60" y="72" width="8" height="11"/><rect x="92" y="72" width="8" height="11"/><rect x="110" y="72" width="8" height="11"/></g>
+      <rect x="76" y="72" width="8" height="16" fill="#2f5a45"/>
+      <path d="M71 62V30h18v32z" fill="#b8ad9a"/><path d="M80 62V30h9v32z" fill="#a0957f"/>
+      <path d="M71 38h18M71 46h18M71 54h18" stroke="#9a8f7c" stroke-width=".8"/>
+      <path d="M26 69l16-10h76l16 10z" fill="#c45f3a"/><path d="M26 69l16-10h4l-14 10z" fill="#9e4a2c"/>
+      <rect x="67" y="27" width="26" height="3" fill="#e9e4d8"/>
+      <path d="M68 27v-6M74 27v-6M80 27v-6M86 27v-6M92 27v-6M68 21h24" stroke="#2b3440" stroke-width="1"/>
+      <circle cx="80" cy="17" r="12" fill="#ffc35a" opacity=".22"/>
+      <rect x="74" y="12" width="12" height="11" fill="#ffd88a"/><path d="M78 12v11M82 12v11" stroke="#e9e4d8" stroke-width=".8"/>
+      <path d="M72.5 12q7.5-7 15 0z" fill="#f1efe8"/><path d="M80 6V3" stroke="#2b3440" stroke-width="1"/>`
   }
 };
 

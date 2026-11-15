@@ -165,7 +165,8 @@ html,body{overflow-x:clip}
   .intro .menu>:nth-child(3){animation-delay:2.2s}
   .intro .menu>:nth-child(4){animation-delay:2.3s}
   .intro .menu>:nth-child(5){animation-delay:2.4s}
-  .intro .progress{animation:rise .5s 2.5s both}
+  .intro .menu>:nth-child(6){animation-delay:2.5s}
+  .intro .progress{animation:rise .5s 2.6s both}
   .intro .waves{animation:fadeIn 1.2s .6s both, drift 9s 1.8s ease-in-out infinite alternate}
 }
 @keyframes lampOn{from{opacity:0;scale:.2}to{opacity:1;scale:1}}
@@ -207,7 +208,17 @@ html,body{overflow-x:clip}
 .back:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
 .chart{position:relative;border-radius:14px;overflow:hidden;background:var(--sea);box-shadow:0 0 0 1px var(--line), 0 20px 50px #0008}
 /* Oblaci magle rata i sloj iznad njih ne hvataju dodire: dodir prolazi do otkrivenih otoka */
-#fogMap,.chart #chartTop{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#fogMap,.fog-old,.chart #chartTop{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+/* Proslava osvijetljenog otoka: stara magla polako nestane i otkrije novi otok, a svjetionik bljesne */
+.fog-old{animation:fogLift 2.6s .5s ease-in-out both}
+@keyframes fogLift{to{opacity:0}}
+.isle .burst{fill:none;stroke:var(--beam);stroke-width:1;opacity:0;pointer-events:none;transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:no-preference){
+  .isle.just-lit .burst{animation:burst 1.8s ease-out 2}
+  .isle.just-lit .lamp{transform-box:fill-box;transform-origin:center;animation:lampBurst 1.8s ease-out}
+}
+@keyframes burst{from{opacity:.9;transform:scale(.4)}to{opacity:0;transform:scale(5)}}
+@keyframes lampBurst{30%{transform:scale(3.2)}}
 .ghost{fill:var(--sea-2);stroke:var(--sand-dim);stroke-width:.6;stroke-linejoin:round;pointer-events:none}
 #chartTop .osm-bg{fill:#0a1729cc}
 #chartTop .osm{fill:var(--sand)}
@@ -311,3 +322,9 @@ html,body{overflow-x:clip}
 .fact{border-left:2px solid var(--beam);padding:2px 0 2px 12px;color:var(--sand);line-height:1.45;text-align:left;margin:0 0 14px}
 .fact b{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--beam);margin-bottom:2px}
 .card .fact{margin:0}
+.card.end{border-color:var(--beam);background:#ffc35a14}
+/* Postavke: čuvanje napretka */
+.keep{margin:0 0 18px;display:flex;flex-direction:column;gap:8px}
+.keep p{margin:0;font-size:13px}
+#backupCode{width:100%;font:13px ui-monospace,monospace;color:var(--foam);background:var(--sea);border:1px solid var(--line);border-radius:8px;padding:8px;resize:none;word-break:break-all;margin-bottom:10px}
+#backupNote{min-height:1.5em;color:var(--sand)}

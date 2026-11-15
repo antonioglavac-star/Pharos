@@ -11,13 +11,31 @@ function islandStatus(i){
 }
 const STATUS_LABEL = { soon:'uskoro', done:'osvijetljen', open:'otvoren', locked:'zaključan' };
 
-function showMap(){
+// lit: otok koji je igrač upravo osvijetlio. Tada karta priredi proslavu: svjetionik bljesne,
+// magla se polako digne sa sljedećeg otoka i kartica ga ponudi.
+function showMap(lit){
   ['game','isle','start','lights'].forEach(s => $(s).hidden = true); $('map').hidden = false;
-  if (!sel){
-    const i = ISLANDS.findIndex((I,i) => islandStatus(i)==='open');
-    sel = ISLANDS[i<0 ? 0 : i].id;
+  const spot = nextSpot();
+  if (lit || !sel) sel = spot ? spot.id : lit || ISLANDS.filter(I => LEVELS[I.id]).pop().id;
+  let old = null;
+  if (lit && !calm()){
+    // Magla kakva je bila prije: bez otoka koji se upravo otvorio
+    drawFog(ISLANDS.filter((I,i) => ['open','done'].includes(islandStatus(i)) && !(spot && I.id===spot.id)).map(I => I.id));
+    old = $('fogMap').cloneNode();
+    old.removeAttribute('id'); old.className = 'fog-old';
+    old.getContext('2d').drawImage($('fogMap'), 0, 0);
   }
   renderMap();
+  if (lit){
+    Feel.lit();
+    const g = $('chart').querySelector(`.isle[data-id="${lit}"]`);
+    if (g) g.classList.add('just-lit');
+  }
+  if (old){
+    $('fogMap').after(old);
+    old.onanimationend = () => old.remove();
+  }
+  window.scrollTo(0, 0);
 }
 
 function renderMap(){
@@ -37,6 +55,7 @@ function renderMap(){
       ${r < 12 ? `<circle class="hit" cx="${cx}" cy="${cy}" r="13"/>` : ''}
       <path class="contour" d="${CHART.contours[I.id]}"/>
       <path class="land" d="${CHART.isles[I.id]}"/>
+      <circle class="burst" cx="${cx}" cy="${cy}" r="6"/>
       <circle class="lamp" cx="${cx}" cy="${cy}" r="2.5"/>
       <text x="${cx}" y="${hh ? cy+hh+13 : cy+13}">${I.name}</text>
     </g>`;
@@ -69,8 +88,33 @@ function renderMap(){
     <svg class="go" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
   $('mapLights').onclick = () => showLights('map');
   const lit = ISLANDS.filter(I => islandDone(I.id)).length;
-  $('litCount').textContent = `${lit}/${ISLANDS.length}`;
+  // Broje se samo otoci koji već imaju razine; oni pod maglom ostaju tajna
+  $('litCount').textContent = `${lit}/${ISLANDS.filter(I => LEVELS[I.id]).length}`;
   renderCard();
+  renderEnd();
+}
+
+// Kraj sadržaja: kad su svi otoci osvijetljeni, igrač dobije završnu karticu umjesto slijepe ulice
+function renderEnd(){
+  const el = $('endCard');
+  el.hidden = !!nextSpot();
+  if (el.hidden) return;
+  const all = ISLANDS.flatMap(I => LEVELS[I.id] || []), stars = all.reduce((s, L) => s + (progress[L.id] || 0), 0);
+  const weak = ISLANDS.find(I => (LEVELS[I.id] || []).some(L => progress[L.id] < 3));
+  el.innerHTML = `<div class="eyebrow">Jadran svijetli</div><h2>Svi otoci su osvijetljeni</h2>
+    <p>Novi otoci izronit će iz magle s idućom nadogradnjom igre. ${weak
+      ? `Dotad skupi sve zvjezdice: imaš ih ${stars} od ${all.length*3}.`
+      : `Imaš i sve zvjezdice: ${stars} od ${all.length*3}. Svaka čast!`}</p>
+    <div class="ctrl-btns">${weak ? '<button class="btn primary" id="endStars">Skupi zvjezdice</button>' : ''}
+      <button class="btn ${weak ? '' : 'primary'}" id="endShare">Podijeli igru</button></div>`;
+  if (weak) $('endStars').onclick = () => showIsle(weak.id);
+  $('endShare').onclick = async () => {
+    const url = location.origin + location.pathname.replace(/index\.html$/, '');
+    try {
+      if (navigator.share) await navigator.share({ title:'Pharos', text:'Upali svjetla Jadrana, otok po otok.', url });
+      else { await navigator.clipboard.writeText(url); $('endShare').textContent = 'Link je kopiran'; }
+    } catch (e) {}
+  };
 }
 
 // Magla rata: oblak dima nad svakim skrivenim otokom; more, kopno i otkriveni otoci ostaju vidljivi. Dim je šum
@@ -169,10 +213,13 @@ function drawFog(ids){
 function renderCard(){
   const i = ISLANDS.findIndex(I => I.id===sel), I = ISLANDS[i], st = islandStatus(i);
   const lv = LEVELS[I.id] || [], solved = lv.filter(L => progress[L.id]).length;
+  // Otok koji je tek izašao iz magle
+  const fresh = st==='open' && !solved && i > 0;
   const text = st==='done' ? (I.fact ? `<div class="fact"><b>Zanimljivost</b>${I.fact}</div>` : '<p>Otok je osvijetljen.</p>')
+    : fresh ? '<p>Magla se podigla i otkrila novi otok. Osvijetli ga i otkrij njegovu priču.</p>'
     : '<p>Osvijetli sve razine i otkrij priču otoka.</p>';
-  const btn = st==='open' ? (solved ? 'Nastavi' : 'Igraj') : 'Otvori otok';
-  $('card').innerHTML = `<div class="eyebrow">${solved} / ${lv.length} razina</div><h2>${I.name}</h2>${text}
+  const btn = st==='open' ? (solved ? 'Nastavi' : fresh ? `Otplovi na otok ${I.name}` : 'Igraj') : 'Otvori otok';
+  $('card').innerHTML = `<div class="eyebrow">${fresh ? 'Novi otok · ' : ''}${solved} / ${lv.length} razina</div><h2>${I.name}</h2>${text}
     <button class="btn primary" id="cardBtn">${btn}</button>`;
   $('cardBtn').onclick = () => showIsle(I.id);
 }

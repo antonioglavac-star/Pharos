@@ -28,6 +28,7 @@
     <p class="tagline">Upali svjetla Jadrana, otok po otok.</p>
     <nav class="menu">
       <button class="btn primary big" id="play">Igraj</button>
+      <button class="btn" id="mapBtn" hidden>Karta otoka</button>
       <button class="btn" id="lightsBtn">Svjetionici</button>
       <button class="btn" id="howBtn">Kako se igra</button>
       <button class="btn" id="settingsBtn">Postavke</button>
@@ -47,6 +48,7 @@
     <li><i class="r-cave"></i><span><b>Modra špilja</b> propušta samo plavo svjetlo.</span></li>
     <li><i class="r-fog"></i><span><b>Magla</b> skriva polja dok zraka ne prođe kroz njih.</span></li>
     <li><i class="r-reef"></i><span><b>Hrid</b>: svaki potez mijenja plimu i oseku. U oseci hrid izroni i zaustavi zraku.</span></li>
+    <li><i class="r-two"></i><span><b>Dva svjetionika</b> rade zajedno, a zrake se smiju križati.</span></li>
     <li><i class="r-help"></i><span>Zapneš li, <b>Pokaži potez</b> označi jedno ogledalo koje treba okrenuti.</span></li>
     <li><i class="r-star"></i><span>Riješi u <b>što manje poteza</b> za tri zvjezdice.</span></li>
   </ul>
@@ -60,7 +62,27 @@
     <label class="switch"><span><b>Šum valova</b>Tiho more u pozadini</span><input type="checkbox" data-set="waves"></label>
     <label class="switch"><span><b>Vibracija</b>Pri dodiru i pobjedi (ne radi na iPhoneu)</span><input type="checkbox" data-set="vibrate"></label>
   </div>
+  <div class="keep">
+    <b>Napredak</b>
+    <p id="keepNote">Napredak se pamti samo na ovom uređaju. Kôd napretka čuva ga i ako se podaci izbrišu.</p>
+    <div class="ctrl-btns">
+      <button class="btn" id="installBtn" hidden>Dodaj na početni zaslon</button>
+      <button class="btn" id="backupBtn">Kôd napretka</button>
+    </div>
+  </div>
   <form method="dialog"><button class="btn primary">Gotovo</button></form>
+</dialog>
+
+<dialog class="sheet" id="backup" aria-labelledby="backupTitle">
+  <h2 id="backupTitle">Kôd napretka</h2>
+  <p>Kopiraj kôd i spremi ga, npr. pošalji ga sebi u poruci. Na drugom uređaju ili nakon brisanja podataka zalijepi ga ovdje i dodirni „Učitaj”.</p>
+  <textarea id="backupCode" rows="4" aria-label="Kôd napretka" spellcheck="false"></textarea>
+  <p id="backupNote" aria-live="polite"></p>
+  <div class="ctrl-btns">
+    <button class="btn primary" id="backupCopy">Kopiraj</button>
+    <button class="btn" id="backupLoad">Učitaj</button>
+    <form method="dialog"><button class="btn">Zatvori</button></form>
+  </div>
 </dialog>
 
 <dialog class="sheet lh-dlg" id="lightDlg" aria-label="Svjetionik">
@@ -115,6 +137,7 @@
       <canvas id="fogMap" aria-hidden="true"></canvas>
       <svg id="chartTop" viewBox="0 0 440 409" aria-hidden="true"></svg>
     </div>
+    <div class="card end" id="endCard" hidden></div>
     <div class="card" id="card" aria-live="polite"></div>
     <button class="next-isle" id="mapLights"></button>
   </section>
@@ -212,6 +235,8 @@
 <script src="js/islands/bisevo.js"></script>
 <script src="js/islands/svetac.js"></script>
 <script src="js/islands/susac.js"></script>
+<script src="js/islands/lastovo.js"></script>
+<script src="js/engine.js"></script>
 <script src="js/feel.js"></script>
 <script src="js/game.js"></script>
 <script src="js/chart.js"></script>
@@ -219,5 +244,6 @@
 <script src="js/island.js"></script>
 <script src="js/lighthouses.js"></script>
 <script src="js/menu.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>

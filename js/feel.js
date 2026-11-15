@@ -78,6 +78,8 @@ const Feel = (() => {
     // Brod je osvijetljen: dva meka tona
     boat(){ if (set.sound){ tone(784, 0, .55, .025); tone(1175, .07, .65, .018); } buzz(15); },
     // Razina riješena: uzlazni zvončić
-    win(){ if (set.sound) [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .11, 1.2, .025)); buzz([20, 60, 20, 60, 40]); }
+    win(){ if (set.sound) [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, i * .11, 1.2, .025)); buzz([20, 60, 20, 60, 40]); },
+    // Otok osvijetljen: dubok ton svjetionika, pa puni akord
+    lit(){ if (set.sound){ tone(131, 0, 2.6, .05); [262, 392, 523, 659, 784].forEach((f, i) => tone(f, .5 + i * .16, 2.4, .022)); } buzz([40, 80, 40, 80, 90]); }
   };
 })();

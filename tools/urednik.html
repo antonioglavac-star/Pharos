@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pharos: uređivač razina</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<link rel="stylesheet" href="../style.css">
+<style>
+/* Tri stupca na računalu (predmeti, ploča, razina), jedan ispod drugog na mobitelu */
+body{height:auto;min-height:100%;padding-block:16px 40px}
+.ed{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.ed-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+.ed-top h1{font-size:26px;margin:0;flex:1 1 auto}
+.ed-top label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px}
+select,textarea{font:inherit;color:var(--foam);background:var(--sea-2);border:1px solid var(--line);border-radius:8px;padding:8px}
+.ed-main{display:grid;grid-template-columns:230px minmax(0,1fr) 300px;gap:20px;align-items:start}
+.panel{background:var(--sea-2);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel h2{font:700 12px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--sand);margin:0}
+.palette{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tool{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border:1px solid var(--line);border-radius:10px;background:var(--sea);color:var(--foam);font:12px var(--body);cursor:pointer;min-width:0;text-align:center}
+.tool:hover{border-color:var(--muted)}
+.tool[aria-pressed="true"]{border-color:var(--beam);background:#ffc35a1f;color:var(--beam)}
+.tool:focus-visible,.modes button:focus-visible,.lv:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
+.tool i{width:34px;height:34px;display:grid;place-items:center;font-style:normal;position:relative}
+.tool .icon{width:100%;height:100%}
+.tool .mirror{width:80%;height:12%}
+.tool .rock{width:74%;height:66%}
+.tool .glyph{font-size:20px}
+.help{margin:0;color:var(--muted);font-size:13px;line-height:1.45;min-height:5.8em}
+.sizes{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:14px}
+.modes{display:flex;gap:4px;background:var(--sea-2);border:1px solid var(--line);border-radius:999px;padding:4px;width:max-content;margin:0 auto 12px}
+.modes button{border:0;background:none;color:var(--muted);font:700 14px var(--body);padding:8px 18px;border-radius:999px;cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--beam);color:var(--sea)}
+.ed-board{position:relative;width:100%;max-width:min(100%,600px);margin:0 auto;touch-action:none;user-select:none}
+.ed-grid{position:absolute;inset:0;display:grid}
+.ed-grid .cell{cursor:pointer}
+.ed-grid .cell:hover{background:#1a3556}
+.ed-grid .off{background:none;border:.5px dashed #1d365666}
+.ed-grid .off:hover{background:#1d365633}
+.ed-grid .afog::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,#a9bbd166 0 5px,#a9bbd133 5px 10px);pointer-events:none}
+.ed-grid .solve{box-shadow:inset 0 0 0 3px var(--beam)}
+.ed-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.ed-overlay .shore{fill:none;stroke:var(--sand);stroke-width:1.2px;vector-effect:non-scaling-stroke;stroke-opacity:.8}
+.ed-overlay polyline{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.play-info{margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;color:var(--muted);min-height:40px;text-align:center}
+.play-info b{color:var(--foam)}
+.status{border-radius:10px;padding:12px;line-height:1.4;font-size:14px;background:var(--sea);border:1px solid var(--line)}
+.status b{display:block;font-family:var(--display);font-size:20px;margin-bottom:2px}
+.status.good{border-color:#4f9d6b}.status.good b{color:#7fd39b}
+.status.bad{border-color:#ff6b5e}.status.bad b{color:#ff8f85}
+.status ul{margin:4px 0 0;padding-left:18px}
+textarea{width:100%;resize:vertical;min-height:62px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.stack .btn{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.levels{display:flex;flex-direction:column;gap:4px;max-height:280px;overflow:auto}
+.lv-row{display:flex;gap:4px;align-items:center}
+.lv{flex:1;min-width:0;text-align:left;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--sea);color:var(--foam);font:14px var(--body);cursor:pointer}
+.lv[aria-current="true"]{border-color:var(--beam);color:var(--beam)}
+.lv small{color:var(--muted)}
+.arrow{width:30px;height:32px;border-radius:8px;border:1px solid var(--line);background:var(--sea);color:var(--foam);cursor:pointer;padding:0}
+.arrow:disabled{opacity:.3;cursor:default}
+.note{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.note.ok{color:#7fd39b}.note.err{color:#ff8f85}
+@media (max-width:980px){ .ed-main{grid-template-columns:1fr} .palette{grid-template-columns:repeat(auto-fill,minmax(74px,1fr))} .help{min-height:0} .ed-center{order:-1} }
+</style>
+</head>
+<body>
+<div class="ed">
+  <header class="ed-top">
+    <h1>Uređivač razina</h1>
+    <label>Otok <select id="islandSel"></select></label>
+  </header>
+  <div class="ed-main">
+    <aside class="panel">
+      <h2>Predmeti</h2>
+      <div class="palette" id="palette"></div>
+      <p class="help" id="toolHelp"></p>
+      <h2>Veličina ploče</h2>
+      <div class="sizes">
+        <select id="sizeW" aria-label="Širina"></select> × <select id="sizeH" aria-label="Visina"></select>
+      </div>
+    </aside>
+    <main class="ed-center">
+      <div class="modes">
+        <button id="modeBuild" aria-pressed="true">Slaganje</button>
+        <button id="modePlay" aria-pressed="false">Isprobaj</button>
+      </div>
+      <div class="ed-board" id="board">
+        <div class="ed-grid" id="grid"></div>
+        <svg class="ed-overlay" id="coastLayer" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <svg class="ed-overlay" id="beamLayer" preserveAspectRatio="none" aria-hidden="true"></svg>
+      </div>
+      <div class="play-info" id="playInfo"></div>
+    </main>
+    <aside class="panel">
+      <h2 id="levelTitle">Nova razina</h2>
+      <div class="status" id="status" aria-live="polite"></div>
+      <button class="btn" id="showSol">Pokaži rješenje</button>
+      <label class="stack"><span class="note">Savjet igraču (kratko, jedna rečenica)</span>
+        <textarea id="hintBox" maxlength="120"></textarea></label>
+      <div class="stack">
+        <button class="btn primary" id="saveBtn">Spremi razinu</button>
+        <button class="btn" id="newBtn">Nova razina</button>
+        <button class="btn" id="delBtn">Izbriši razinu</button>
+      </div>
+      <p class="note" id="saveNote"></p>
+      <h2>Razine na otoku</h2>
+      <div class="levels" id="levels"></div>
+    </aside>
+  </div>
+</div>
+<script src="../js/islands.js"></script>
+<script src="../js/engine.js"></script>
+<script src="urednik.js"></script>
+</body>
+</html>
