@@ -13,6 +13,40 @@ function saveStars(id, s){
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (e) {}
 }
 const islandDone = id => !!LEVELS[id] && LEVELS[id].every(L => progress[L.id]);
+// Zlatni svjetionik: sve tri zvjezdice na svakoj razini otoka
+const islandGold = id => !!LEVELS[id] && LEVELS[id].every(L => progress[L.id]===3);
+
+// Započeta razina: pamte se samo potezi (koja su ogledala okrenuta, redom), pa se pri povratku ponove
+const LEVEL_KEY = 'svjetionik-razina';
+let hist = [];   // potezi u ovom pokušaju: ogledalo i polja magle koja je taj potez otkrio
+function saveLevel(){
+  try {
+    if (hist.length && !won) localStorage.setItem(LEVEL_KEY, JSON.stringify({ id: LV[li].id, flips: hist.map(h => h.k) }));
+    else localStorage.removeItem(LEVEL_KEY);
+  } catch (e) {}
+}
+
+// Pomoć "Pokaži potez" je ograničena: najviše HELP_MAX, a potrošena se vraća nakon HELP_MIN minuta.
+// Kasnije se ovdje može dodati i dobrovoljna reklama za novu pomoć.
+const HELP_KEY = 'svjetionik-pomoc', HELP_MAX = 3, HELP_MIN = 20;
+let help = { n: HELP_MAX, t: 0 };
+try { help = JSON.parse(localStorage.getItem(HELP_KEY)) || help; } catch (e) {}
+function helpLeft(){
+  const step = HELP_MIN*60000, got = help.n < HELP_MAX ? Math.floor((Date.now() - help.t) / step) : 0;
+  if (got > 0){ help.n = Math.min(HELP_MAX, help.n + got); help.t += got*step; }
+  return help.n;
+}
+function useHelp(){
+  if (helpLeft() === HELP_MAX) help.t = Date.now();
+  help.n--;
+  try { localStorage.setItem(HELP_KEY, JSON.stringify(help)); } catch (e) {}
+}
+function drawHelp(){
+  const n = helpLeft();
+  $('helpCount').textContent = n;
+  $('helpBtn').classList.toggle('empty', !n);
+  $('undoBtn').disabled = won || !hist.length;
+}
 // Otok je otvoren ako ima razine i svi prethodni otoci s razinama su osvijetljeni
 const islandOpen = i => !!LEVELS[ISLANDS[i].id] && ISLANDS.slice(0,i).every(I => !LEVELS[I.id] || islandDone(I.id));
 
@@ -29,6 +63,7 @@ function drawCoast(L){
   const M = .15, sh = !!L.shape, W = L.w+(sh?2*M:0), H = L.h+(sh?2*M:0), b = $('board'), g = $('grid');
   b.classList.toggle('shaped', sh);
   b.style.aspectRatio = W + ' / ' + H;
+  b.style.setProperty('--ar', W / H);   // po ovome ploča stane i na nizak zaslon
   b.style.setProperty('--px', sh ? M*100/W+'%' : '0%');
   b.style.setProperty('--py', sh ? M*100/H+'%' : '0%');
   g.style.clipPath = sh ? 'url(#isleClip)' : '';
@@ -54,7 +89,7 @@ function openIsland(id, i){
 }
 
 function load(i){
-  li = i; moves = 0; won = false;
+  li = i; moves = 0; won = false; hist = [];
   const L = LV[i];
   state = parseCells(L);
   $('title').textContent = 'Razina ' + (i+1);
@@ -80,7 +115,7 @@ function load(i){
       el = document.createElement('button');
       el.setAttribute('aria-label','Ogledalo, dodirni za okretanje');
       el.innerHTML = `<div class="mirror" style="transform:rotate(${c.rot}deg)"></div>`;
-      el.onclick = () => rotate(k, el);
+      el.onclick = () => rotate(k);
     } else {
       el = document.createElement('div');
       const lamp = lightsOf(L).find(l => l.x===x && l.y===y);
@@ -105,7 +140,15 @@ function load(i){
   $('tide').hidden = !L.tide;
   litBefore = new Set(); quiet = true;
   trace();
+  // Povratak u započetu razinu: ponovi spremljene poteze, tiho
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(LEVEL_KEY)); } catch (e) {}
+  if (saved && saved.id===L.id && saved.flips.every(k => state[k] && state[k].t==='m')){
+    for (const k of saved.flips) if (!won) flip(k);
+    if (hist.length) $('hint').textContent = 'Nastavljaš gdje si stao. Strelica gore desno vraća razinu na početak.';
+  }
   quiet = false;
+  drawHelp();
   showTips(L);
 }
 
@@ -155,16 +198,46 @@ function nextTip(){
 }
 $('tip').addEventListener('close', () => nextTip());
 
-function rotate(k, el){
-  if (won) return;
+const cellEl = k => document.querySelector(`#grid [data-k="${k}"]`);
+const turnMirror = (k, by) => {
   const c = state[k];
-  c.v = c.v==='/' ? '\\' : '/';
-  c.rot += 90;
-  el.firstChild.style.transform = `rotate(${c.rot}deg)`;
+  c.v = flipMirror(c.v); c.rot += by;
+  cellEl(k).firstChild.style.transform = `rotate(${c.rot}deg)`;
+};
+
+// Jedan potez: okreni ogledalo, prati zraku i zapamti što je zraka pritom otkrila u magli
+function flip(k){
+  const before = new Set(fog);
+  turnMirror(k, 90);
   moves++; $('moves').textContent = moves;
+  trace();
+  hist.push({ k, opened: [...before].filter(f => !fog.has(f)) });
+}
+
+function rotate(k){
+  if (won) return;
   Feel.mirror();
   $('hint').textContent = LV[li].hint;
-  trace();
+  flip(k);
+  saveLevel(); drawHelp();
+}
+
+// Korak natrag: vrati zadnje okrenuto ogledalo, potez i maglu koju je taj potez otkrio
+function undo(){
+  if (won || !hist.length) return;
+  const { k, opened } = hist.pop();
+  turnMirror(k, -90);
+  moves--; $('moves').textContent = moves;
+  for (const f of opened){
+    fog.add(f);
+    const el = cellEl(f);
+    el.classList.remove('clear');
+    if (el.tagName==='BUTTON'){ el.disabled = true; el.setAttribute('aria-label','Skriveno u magli'); }
+  }
+  Feel.mirror();
+  $('hint').textContent = LV[li].hint;
+  quiet = true; trace(); quiet = false;
+  saveLevel(); drawHelp();
 }
 
 function trace(){
@@ -196,6 +269,7 @@ function trace(){
   });
   if (boats.every(k=>lit.has(k)) && !won){
     won = true;
+    try { localStorage.removeItem(LEVEL_KEY); } catch (e) {}
     // Pobjeda: brodovi uplove, zraka zasja jače, pa se pokaže poruka
     $('board').classList.add('won');
     Feel.win();
@@ -218,26 +292,38 @@ function findHint(){
 
 $('helpBtn').onclick = () => {
   if (won) return;
-  document.querySelectorAll('.hinted').forEach(h => h.classList.remove('hinted'));
+  // Pomoć je već na ploči: ne troši se dvaput
+  if (document.querySelector('.hinted')){ $('hint').textContent = 'Okreni označeno ogledalo.'; return; }
+  if (!helpLeft()){
+    const wait = Math.max(1, Math.ceil((help.t + HELP_MIN*60000 - Date.now()) / 60000));
+    $('hint').textContent = `Pomoć je potrošena. Nova stiže za ${wait} min.`;
+    return;
+  }
   const k = findHint();
   if (k){
-    document.querySelector(`#grid [data-k="${k}"]`).classList.add('hinted');
+    cellEl(k).classList.add('hinted');
     $('hint').textContent = 'Okreni označeno ogledalo.';
+    useHelp(); drawHelp();
   } else {
     $('hint').textContent = 'Potrebno ogledalo skriva se u magli. Usmjeri zraku u maglu da ga otkriješ.';
   }
 };
+$('undoBtn').onclick = undo;
+// Pomoć se vraća s vremenom, pa se brojka osvježi i dok igrač gleda ploču
+setInterval(() => { if (!$('game').hidden) drawHelp(); }, 30000);
 
 function showWin(){
-  const L = LV[li], wasDone = islandDone(isl.id);
+  const L = LV[li], wasDone = islandDone(isl.id), wasGold = islandGold(isl.id);
   const s = moves<=L.par ? 3 : moves<=L.par+2 ? 2 : 1;
   saveStars(L.id, s);
+  drawHelp();
   const justLit = !wasDone && islandDone(isl.id);
   toIsle = li===LV.length-1;
   litNow = justLit ? isl.id : null;   // upravo osvijetljen otok: sljedeći korak je proslava na karti
   $('winTitle').textContent = justLit ? `Otok ${isl.name} je osvijetljen` : 'Svi brodovi su u luci';
   $('stars').innerHTML = [1,2,3].map(i=>`<span class="${i<=s?'':'off'}">★</span>`).join('');
-  $('winText').textContent = `Riješeno u ${moves} ${moves===1?'potezu':'poteza'} (cilj: ${L.par}).`;
+  $('winText').textContent = `Riješeno u ${moves} ${moves===1?'potezu':'poteza'} (cilj: ${L.par}).`
+    + (!wasGold && islandGold(isl.id) ? ' Sve zvjezdice otoka su tvoje: svjetionik je sada zlatan!' : '');
   $('winFact').hidden = !(justLit && isl.fact);
   $('winFact').innerHTML = `<b>Zanimljivost</b>${isl.fact}`;
   // Novi svjetionik u kolekciji
@@ -253,11 +339,12 @@ function showWin(){
   $('next').focus();
 }
 
-$('reset').onclick = () => load(li);
+const restart = () => { try { localStorage.removeItem(LEVEL_KEY); } catch (e) {} load(li); };
+$('reset').onclick = restart;
 // Pauza: nastavak, ponovni početak, karta otoka, postavke, početni izbornik
 $('pauseBtn').onclick = () => $('pause').showModal();
 $('pResume').onclick = () => $('pause').close();
-$('pRestart').onclick = () => { $('pause').close(); load(li); };
+$('pRestart').onclick = () => { $('pause').close(); restart(); };
 $('pIsle').onclick = () => { $('pause').close(); showIsle(isl.id); };
 $('pSettings').onclick = () => { $('pause').close(); $('settings').showModal(); };
 $('pMenu').onclick = () => { $('pause').close(); showStart(false); };

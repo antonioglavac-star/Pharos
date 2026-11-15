@@ -106,10 +106,27 @@ html,body{overflow-x:clip}
 .count>span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .stage{flex:1;display:flex;align-items:center;justify-content:center;margin-inline:calc(-1 * max(16px, env(safe-area-inset-left, 0px)))}
 @media (min-width:500px){ .stage{margin-inline:0} }
-.stage .board{width:100%}
+/* Ploča je široka koliko stane, ali nikad viša od zaslona (niski mobiteli) */
+.stage .board{width:min(100%, calc((100dvh - 250px) * var(--ar,1)))}
 .below{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
 .below .tide{text-align:left;width:100%}
-.btn.help{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:13px}
+.below-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.btn.help{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 14px;font-size:13px}
+.btn.help svg{width:18px;height:18px;fill:none;stroke:var(--beam);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.btn.help:disabled{opacity:.4;cursor:default}
+#helpCount{min-width:20px;height:20px;border-radius:999px;background:var(--beam);color:var(--sea);font-size:12px;display:grid;place-items:center;margin-left:2px}
+#helpBtn.empty #helpCount{background:var(--line);color:var(--muted)}
+.hud h1,.hud .eyebrow{white-space:nowrap}
+@media (max-width:350px){ .hud h1{font-size:20px} .hud .back{width:40px;height:40px} .hud-right{gap:6px} }
+/* Položen mobitel je prenizak za ploču: zamoli igrača da ga uspravi */
+@media (orientation:landscape) and (max-height:480px){
+  body::after{content:"Okreni mobitel uspravno za igru.";position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;text-align:center;background:var(--sea);color:var(--sand);font:700 18px var(--body)}
+}
+.gold-note{margin:0;color:var(--muted);font-size:14px}
+.gold-note.got{color:var(--beam)}
+.lh-gold{font-size:12px;font-weight:700;color:var(--beam)}
+.lh-gold.dim{font-weight:400;color:var(--muted)}
+.lh-card.gold{border-color:var(--beam);box-shadow:0 0 14px #ffc35a44}
 .pause-btns{display:flex;flex-direction:column;gap:10px}
 .tip{text-align:center}
 .tip h2{margin-bottom:8px}
@@ -202,7 +219,7 @@ html,body{overflow-x:clip}
 #helpBtn{display:inline-flex;align-items:center;gap:6px}
 .rules i .mirror{width:80%;height:13%}
 .titlebar{display:flex;align-items:flex-end;gap:10px}
-.back{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--foam);cursor:pointer;flex:none;padding:0;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+.back{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--foam);cursor:pointer;flex:none;padding:0;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
 .back svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .back:hover{border-color:var(--muted)}
 .back:focus-visible{outline:2px solid var(--beam);outline-offset:2px}
@@ -234,13 +251,14 @@ html,body{overflow-x:clip}
 .isle .land,.isle .contour,.isle .lamp{pointer-events:none}
 .isle .contour{fill:none;stroke:var(--sand-dim);stroke-width:.7;stroke-dasharray:2 3;stroke-linejoin:round}
 .isle .land{fill:var(--sea-2);stroke:var(--sand);stroke-width:.9;stroke-linejoin:round}
-.isle text{fill:var(--sand);font:700 10px var(--body);text-anchor:middle;letter-spacing:.04em}
+.isle text{fill:var(--sand);font:700 10px var(--body);font-size:calc(11px * var(--tz,1));text-anchor:middle;letter-spacing:.04em;paint-order:stroke;stroke:var(--sea);stroke-width:2.5px;stroke-linejoin:round}
 /* Osvijetljeni otoci trajno svijetle zlatno */
 .isle.done .land{fill:#ffc35a40;stroke:var(--beam);filter:drop-shadow(0 0 3px #ffc35acc) drop-shadow(0 0 8px #ffc35a66)}
 .isle.done .contour{stroke:#ffc35a80}
 .isle.done text{fill:var(--beam)}
 .isle.done .lamp{filter:drop-shadow(0 0 6px var(--beam)) drop-shadow(0 0 12px var(--beam))}
-.isle .lamp{fill:var(--beam);filter:drop-shadow(0 0 4px var(--beam))}
+/* translate:none jer i lampa na početnom ekranu ima klasu .lamp s pomakom, koji bi svjetlo odnio s otoka */
+.isle .lamp{fill:var(--beam);filter:drop-shadow(0 0 4px var(--beam));translate:none}
 .isle.sel .contour,.isle:focus-visible .contour{stroke:var(--beam);stroke-width:1.2;stroke-dasharray:none}
 @media (prefers-reduced-motion:no-preference){ .isle.open .lamp{animation:flicker 2.4s ease-in-out infinite} }
 /* Karta otoka: obris otoka, plićak oko njega i staza razina uz obalu */
@@ -251,7 +269,7 @@ html,body{overflow-x:clip}
 .route{fill:none;stroke:var(--sand-dim);stroke-linecap:round;stroke-linejoin:round}
 .route.lit{stroke:var(--beam);stroke-dasharray:none;opacity:.8}
 .isle-marks{position:absolute;inset:0}
-.mk{position:absolute;translate:-50% -50%;width:36px;height:36px;border-radius:50%;padding:0;border:1.5px solid var(--sand-dim);background:var(--sea);color:var(--muted);font:700 13px var(--body);cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+.mk{position:absolute;translate:-50% -50%;width:40px;height:40px;border-radius:50%;padding:0;border:1.5px solid var(--sand-dim);background:var(--sea);color:var(--muted);font:700 13px var(--body);cursor:pointer;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
 .mk small{position:absolute;top:100%;left:50%;translate:-50% 1px;font-size:9px;letter-spacing:1px;color:var(--beam);white-space:nowrap}
 .mk.done{background:var(--beam);border-color:var(--beam);color:var(--sea)}
 .mk.cur{border-color:var(--beam);color:var(--beam);box-shadow:0 0 0 4px #ffc35a2e}

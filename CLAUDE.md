@@ -49,6 +49,13 @@ Nema build koraka ni ovisnosti. Igra se pokreće otvaranjem `index.html` u pregl
 - „Igraj” i „Nastavi” vode ravno u razinu na kojoj je igrač stao (`nextSpot` u `game.js`); karta se otvara gumbom „Karta otoka” ili kad je sve riješeno.
 - U prvoj razini nema prozora s uputom: ogledalo samo pulsira. Ostali predmeti i dalje dobiju prozor (`TIPS`).
 - Kad igrač osvijetli otok, gumb „Na kartu” otvara proslavu (`showMap(lit)`): svjetionik bljesne, magla se digne sa sljedećeg otoka i kartica nudi „Otplovi na otok …”. Na osvijetljenom otoku glavni gumb vodi na otok koji čeka.
+- „Korak natrag” vraća zadnji potez (i maglu koju je otkrio). Započeta razina se pamti kao popis poteza (ključ `svjetionik-razina`) i ponovi pri povratku; strelica „Ispočetka” je briše.
+- Pomoć „Pokaži potez” je ograničena: 3 pomoći, potrošena se vrati za 20 minuta (`HELP_MAX`, `HELP_MIN` u `game.js`, ključ `svjetionik-pomoc`). Tu kasnije dolazi dobrovoljna reklama za novu pomoć.
+- Zvjezdice imaju svrhu: sve tri na svakoj razini otoka daju zlatni svjetionik u kolekciji (`islandGold`).
+- „Kako se igra” pokazuje samo predmete koje je igrač već sreo.
+- Karta se približi otkrivenim otocima (`mapView` u `map.js`) i širi se kako se otoci otkrivaju; oblaci prate isti pogled.
+- Boje imaju i znak: crvena je romb, plava krug, isti na filteru i na jedru (`ICONS.mark` u `engine.js`). Novu boju treba dodati i tamo.
+- Položen mobitel dobije poruku da ga treba uspraviti; ploča nikad nije viša od zaslona.
 - Kad su svi otoci osvijetljeni, karta pokaže završnu karticu (`renderEnd`): lov na zvjezdice i „Podijeli igru”. Brojači otoka broje samo otoke koji imaju razine.
 
 ## Objava

@@ -24,6 +24,12 @@ function showIsle(id){
   $('isleFact').hidden = lit && !I.fact;
   $('isleFact').innerHTML = lit ? `<b>Zanimljivost</b>${I.fact}`
     : `<b>Zanimljivost otoka</b>Osvijetli svih ${lv.length} razina i otkrij priču o otoku ${I.name}.`;
+  // Zvjezdice imaju svrhu: sve tri na svakoj razini pozlate svjetionik otoka u kolekciji
+  const missing = lv.length*3 - stars;
+  $('isleGold').classList.toggle('got', !missing);
+  $('isleGold').textContent = !missing ? '★ Zlatni svjetionik: skupljene su sve zvjezdice otoka.'
+    : lit ? `Još ${missing} ${missing===1 ? 'zvjezdica' : missing<5 ? 'zvjezdice' : 'zvjezdica'} do zlatnog svjetionika.`
+    : 'Tri zvjezdice na svakoj razini donose zlatni svjetionik.';
   renderMechs(id);
   renderNextIsle(id);
   drawIsle(id, lv);
@@ -86,9 +92,9 @@ function drawIsle(id, lv){
   const hull = lo.slice(0, -1).concat(hi.slice(0, -1));
   const hullPer = hull.reduce((s, p, i) => { const q = hull[(i+1) % hull.length]; return s + Math.hypot(q[0]-p[0], q[1]-p[1]); }, 0);
 
-  // Okvir i odmak staze od obale (u pikselima ekrana). Oznaka je široka 36 px, pa im treba bar 44 px razmaka:
+  // Okvir i odmak staze od obale (u pikselima ekrana). Oznaka je široka 40 px, pa im treba bar 48 px razmaka:
   // ako oko otoka nema dovoljno mjesta (dugi uski otok, puno razina), staza se odmiče dalje od obale.
-  let s = 1, offPx = 27;
+  let s = 1, offPx = 29;
   // Okvir je širok W, a visok najviše 1,1 W (visoki otoci poput Biševa); otok mora stati s rubom za oznake
   const frame = () => {
     const m = 2*(offPx + 26);
@@ -96,7 +102,7 @@ function drawIsle(id, lv){
     const hPx = Math.min(Math.max(b.height*s + m, W*.55), W*1.1);
     return [W / s, hPx / s];
   };
-  for (let k = 0; k < 4; k++){ frame(); offPx = Math.max(27, (44*n - hullPer*s) / (2*Math.PI)); }
+  for (let k = 0; k < 4; k++){ frame(); offPx = Math.max(29, (48*n - hullPer*s) / (2*Math.PI)); }
   const [vw, vh] = frame(), unit = 1 / s;
   const vx = b.x + b.width/2 - vw/2, vy = b.y + b.height/2 - vh/2;
   svg.setAttribute('viewBox', `${vx} ${vy} ${vw} ${vh}`);

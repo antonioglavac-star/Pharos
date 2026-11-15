@@ -2,12 +2,15 @@
 // Isti kod koriste igra (game.js), provjera razina (tools/check-levels.js) i alat za slaganje (tools/urednik.html).
 
 const ICONS = {
+  // Boja ima i svoj znak, da se razlikuje i bez boje: crvena je romb, plava krug (isti na filteru i na jedru)
+  mark: (c, x, y, r, fill) => c==='r' ? `<path d="M${x} ${y-r*1.25}l${r} ${r*1.25}l${-r} ${r*1.25}l${-r} ${-r*1.25}z" fill="${fill}"/>`
+    : c==='b' ? `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}"/>` : '',
   light: d => `<svg class="icon" viewBox="0 0 40 40" style="transform:rotate(${Math.atan2(d[1],d[0])*180/Math.PI}deg)">
      <circle cx="20" cy="20" r="17" fill="#ffc35a22"/>
      <g transform="rotate(90 20 20)"><path d="M14 34h12l-2.5-20h-7z" fill="#e9eff7"/><path d="M15 27h10l-.6-5h-8.8z" fill="#d9534f"/>
      <rect x="15.5" y="9" width="9" height="5" rx="1" fill="#ffc35a"/><path d="M14.5 9h11l-5.5-4z" fill="#d9534f"/></g></svg>`,
-  filter: c => `<svg class="icon" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="7" fill="${COL[c]}" fill-opacity=".38" stroke="${COL[c]}" stroke-width="2.5"/><path d="M14 15l6-3" stroke="#fff9" stroke-width="2" stroke-linecap="round"/></svg>`,
-  boat: c => `<svg class="icon" viewBox="0 0 40 40"><path d="M7 25h26l-4 7H11z" fill="#c9d4e3"/><path class="sail" d="M20 6v17H10z" fill="${c?COL[c]:'#e9eff7'}"/><path d="M21 9v14h8z" fill="#8ea3bf"/><path d="M5 34c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 6 2" stroke="#8ea3bf55" stroke-width="1.5" fill="none"/></svg>`,
+  filter: c => `<svg class="icon" viewBox="0 0 40 40"><rect x="9" y="9" width="22" height="22" rx="7" fill="${COL[c]}" fill-opacity=".38" stroke="${COL[c]}" stroke-width="2.5"/>${ICONS.mark(c, 20, 20, 4.6, '#ffffffd9')}</svg>`,
+  boat: c => `<svg class="icon" viewBox="0 0 40 40"><path d="M7 25h26l-4 7H11z" fill="#c9d4e3"/><path class="sail" d="M20 6v17H10z" fill="${c?COL[c]:'#e9eff7'}"/>${ICONS.mark(c, 16.4, 18.6, 2.5, '#0a1729')}<path d="M21 9v14h8z" fill="#8ea3bf"/><path d="M5 34c4 0 4-2 8-2s4 2 8 2 4-2 8-2 4 2 6 2" stroke="#8ea3bf55" stroke-width="1.5" fill="none"/></svg>`,
   cave: () => `<svg class="icon" viewBox="0 0 40 40"><path d="M4 34C4 17 10 7 20 7s16 10 16 27z" fill="#34404f"/><path d="M9 30C10 19 14 12 20 11" stroke="#4a5768" stroke-width="2" fill="none" stroke-linecap="round"/><path class="mouth" d="M12 34c0-9 3.5-15 8-15s8 6 8 15z" fill="#07101d"/></svg>`,
   // hrid: kamen s pjenom; u plimi ga prekrije more (klasa .up na ćeliji znači oseka)
   reef: () => `<svg class="icon" viewBox="0 0 40 40"><path class="stone" d="M6 30c1-10 5-18 13-18 4 0 6 3 9 3 4 0 7 6 7 15z" fill="#4a5768"/><path class="stone" d="M12 21c2-4 5-6 8-6" stroke="#6a7889" stroke-width="2" fill="none" stroke-linecap="round"/><path class="sea" d="M3 23c3-2 5 2 8 0s5-2 8 0 5 2 8 0 5-2 8 0 4 1 3 1v12H3z" fill="#2b5f8f" fill-opacity=".8"/><path class="foam" d="M4 30c3-2 5 2 8 0s5-2 8 0 5 2 8 0 5-2 8 0" stroke="#e9eff7" stroke-opacity=".7" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`,

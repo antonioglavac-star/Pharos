@@ -32,10 +32,24 @@ function showMap(lit){
     if (g) g.classList.add('just-lit');
   }
   if (old){
+    old.style.cssText = $('fogMap').style.cssText;   // isti pogled (zum) kao nova magla
     $('fogMap').after(old);
     old.onanimationend = () => old.remove();
   }
   window.scrollTo(0, 0);
+}
+
+// Dio karte koji se prikazuje: okvir oko otkrivenih otoka s rubom, u omjeru cijele karte, najmanje pola širine
+function mapView(ids){
+  const W = CHART.w, H = CHART.h, PAD = 52;
+  let x0 = W, y0 = H, x1 = 0, y1 = 0;
+  for (const id of ids){
+    const [cx, cy, r, hh] = CHART.c[id], ry = hh || r;
+    x0 = Math.min(x0, cx-r); x1 = Math.max(x1, cx+r); y0 = Math.min(y0, cy-ry); y1 = Math.max(y1, cy+ry+14);
+  }
+  const w = Math.min(W, Math.max(W*.5, x1-x0 + 2*PAD, (y1-y0 + 2*PAD) * W/H)), h = w * H/W;
+  const x = Math.min(W-w, Math.max(0, (x0+x1)/2 - w/2)), y = Math.min(H-h, Math.max(0, (y0+y1)/2 - h/2));
+  return { x, y, w, h };
 }
 
 function renderMap(){
@@ -60,7 +74,13 @@ function renderMap(){
       <text x="${cx}" y="${hh ? cy+hh+13 : cy+13}">${I.name}</text>
     </g>`;
   }).join('');
-  $('chart').setAttribute('viewBox', `0 0 ${W} ${H}`);
+  // Karta se približi otkrivenim otocima (i malo magle oko njih), pa su otoci i imena veći.
+  // Kako se otoci otkrivaju, pogled se širi. Oblaci prate isti pogled.
+  const v = mapView(ISLANDS.filter((I,i) => shown(i)).map(I => I.id)), cv = $('fogMap');
+  $('chart').setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
+  $('chart').style.setProperty('--tz', Math.max(.62, Math.sqrt(v.w / W)));
+  cv.style.width = W/v.w*100 + '%'; cv.style.height = H/v.h*100 + '%';
+  cv.style.left = -v.x/v.w*100 + '%'; cv.style.top = -v.y/v.h*100 + '%';
   $('chart').innerHTML = `
     <defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <line x1="0" y1="0" x2="0" y2="5"/></pattern></defs>
