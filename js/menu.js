@@ -7,6 +7,9 @@ function showStart(intro){
   const started = Object.keys(progress).length > 0;
   $('play').textContent = started ? 'Nastavi' : 'Igraj';
   $('mapBtn').hidden = !started;
+  // Dnevna razina se nudi kad je osvijetljen prvi otok; kvačica znači da je današnja riješena
+  $('dailyBtn').hidden = !dailyOpen();
+  $('dailyBtn').innerHTML = dailyDone() ? 'Dnevna razina <span class="tick">✓</span>' : 'Dnevna razina <span class="dot-new"></span>';
   const lit = ISLANDS.filter(I => islandDone(I.id)).length, spot = nextSpot();
   // Otok koji je tek izašao iz magle (npr. stigao je s nadogradnjom) najavi se već u izborniku
   const fresh = spot && spot.i===0 && spot.id!==ISLANDS[0].id && !LEVELS[spot.id].some(L => progress[L.id]);

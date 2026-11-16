@@ -95,7 +95,7 @@ function load(i){
   li = i; moves = 0; won = false; hist = [];
   const L = LV[i];
   state = parseCells(L);
-  $('title').textContent = 'Razina ' + (i+1);
+  $('title').textContent = isl.daily ? isl.daily.label : 'Razina ' + (i+1);
   $('par').textContent = L.par;
   $('hint').textContent = L.hint;
   $('win').hidden = true;
@@ -319,6 +319,8 @@ setInterval(() => { if (!$('game').hidden) drawHelp(); }, 30000);
 function showWin(){
   const L = LV[li], wasDone = islandDone(isl.id), wasGold = islandGold(isl.id);
   const s = moves<=L.par ? 3 : moves<=L.par+2 ? 2 : 1;
+  $('stars').innerHTML = [1,2,3].map(i=>`<span class="${i<=s?'':'off'}">★</span>`).join('');
+  if (isl.daily) return dailyWin(L, s);   // dnevna razina ima svoj završetak (daily.js)
   // Prvo rješenje razine ide u statistiku: po tome se vidi do koje razine igrači stižu
   if (!progress[L.id]) track('rijeseno/' + L.id);
   saveStars(L.id, s);
@@ -328,7 +330,6 @@ function showWin(){
   if (justLit) track('otok/' + isl.id);
   litNow = justLit ? isl.id : null;   // upravo osvijetljen otok: sljedeći korak je proslava na karti
   $('winTitle').textContent = justLit ? `Otok ${isl.name} je osvijetljen` : 'Svi brodovi su u luci';
-  $('stars').innerHTML = [1,2,3].map(i=>`<span class="${i<=s?'':'off'}">★</span>`).join('');
   $('winText').textContent = `Riješeno u ${moves} ${moves===1?'potezu':'poteza'} (cilj: ${L.par}).`
     + (!wasGold && islandGold(isl.id) ? ' Sve zvjezdice otoka su tvoje: svjetionik je sada zlatan!' : '');
   $('winFact').hidden = !(justLit && isl.fact);
@@ -342,6 +343,12 @@ function showWin(){
   }
   $('next').textContent = litNow ? 'Na kartu' : toIsle ? 'Na otok' : 'Sljedeća razina';
   $('winIsle').hidden = toIsle || !!litNow;
+  // Osvijetljeni otok se može podijeliti, sa slikom novog svjetionika
+  $('winShare').hidden = !litNow;
+  $('winShare').textContent = 'Podijeli';
+  // Slika se priprema unaprijed, da dijeljenje krene odmah na dodir (mobiteli to traže)
+  const pic = H ? lightImage(isl.id) : null;
+  $('winShare').onclick = async () => share(`Otok ${isl.name} je osvijetljen! Pharos: upali svjetla Jadrana, otok po otok.`, $('winShare'), await pic);
   $('win').hidden = false;
   $('next').focus();
 }
@@ -349,12 +356,14 @@ function showWin(){
 const restart = () => { try { localStorage.removeItem(LEVEL_KEY); } catch (e) {} load(li); };
 $('reset').onclick = restart;
 // Pauza: nastavak, ponovni početak, karta otoka, postavke, početni izbornik
-$('pauseBtn').onclick = () => $('pause').showModal();
+// Izlaz iz razine: na otok, a iz dnevne razine u izbornik
+const leaveLevel = () => isl.daily ? showStart(false) : showIsle(isl.id);
+$('pauseBtn').onclick = () => { $('pIsle').hidden = !!isl.daily; $('pause').showModal(); };
 $('pResume').onclick = () => $('pause').close();
 $('pRestart').onclick = () => { $('pause').close(); restart(); };
 $('pIsle').onclick = () => { $('pause').close(); showIsle(isl.id); };
 $('pSettings').onclick = () => { $('pause').close(); $('settings').showModal(); };
 $('pMenu').onclick = () => { $('pause').close(); showStart(false); };
-$('next').onclick = () => litNow ? showMap(litNow) : toIsle ? showIsle(isl.id) : load(li+1);
-$('winIsle').onclick = () => showIsle(isl.id);
-$('back').onclick = () => showIsle(isl.id);
+$('next').onclick = () => isl.daily ? showStart(false) : litNow ? showMap(litNow) : toIsle ? showIsle(isl.id) : load(li+1);
+$('winIsle').onclick = leaveLevel;
+$('back').onclick = leaveLevel;

@@ -97,10 +97,30 @@ const LIGHTHOUSES = {
   }
 };
 
+// Nagradni svjetionici: ne pripadaju otoku iz igre, nego se sastave od dijelova iz dnevnih razina (daily.js)
+const BONUS = {
+  velirat: {
+    name:'Veli rat', where:'Sjeverozapadni rt Dugog otoka', year:1849, tower:36, light:41, range:22, crew:true,
+    about:'Visoka kula uz dugu zgradu na kraju Dugog otoka. Svjetlo je 41 metar iznad mora i vidi se do 22 nautičke milje, a na svjetioniku i danas radi posada.',
+    src:'https://www.plovput.hr/pomorska-signalizacija/svjetionici/svjetionik/a/view/id/40',
+    svg:`<path d="M0 102Q30 92 60 93h60q22 2 40 9v18H0z" fill="#7b7366"/>
+      <rect x="30" y="76" width="92" height="18" fill="#e9dcae"/><rect x="30" y="90" width="92" height="4" fill="#cdbf8f"/>
+      <path d="M26 77l10-8h80l10 8z" fill="#c45f3a"/>
+      <g fill="#6d6250"><rect x="38" y="81" width="4" height="6"/><rect x="50" y="81" width="4" height="6"/><rect x="62" y="81" width="4" height="6"/><rect x="94" y="81" width="4" height="6"/><rect x="106" y="81" width="4" height="6"/></g>
+      <path d="M73 94l2-64h10l2 64z" fill="#f0e3b4"/><path d="M82 30h3l2 64h-4z" fill="#d6c891"/>
+      <rect x="71" y="27" width="18" height="3" fill="#e9e4d8"/>
+      <path d="M72 27v-5M78 27v-5M82 27v-5M88 27v-5M72 22h16" stroke="#2b3440" stroke-width="1"/>
+      <circle cx="80" cy="17" r="12" fill="#ffc35a" opacity=".22"/>
+      <rect x="75" y="12" width="10" height="11" fill="#ffd88a"/><path d="M78.5 12v11M81.5 12v11" stroke="#e9e4d8" stroke-width=".8"/>
+      <path d="M73.5 12q6.5-7 13 0z" fill="#f1efe8"/><path d="M80 6V3" stroke="#2b3440" stroke-width="1"/>`
+  }
+};
+const lightOf = id => LIGHTHOUSES[id] || BONUS[id];
+
 // Crtež svjetionika s morem; isti crtež služi i za zaključanu sliku (sivu, preko CSS-a)
 const lighthouseArt = id => `<svg class="lh-art" viewBox="0 0 160 120" aria-hidden="true">
   <rect y="96" width="160" height="24" fill="#173f63"/><path d="M0 104q10-3 20 0t20 0 20 0 20 0 20 0 20 0 20 0 20 0" stroke="#e9eff7" stroke-opacity=".25" fill="none"/>
-  ${LIGHTHOUSES[id].svg}</svg>`;
+  ${lightOf(id).svg}</svg>`;
 
 const isleOf = id => ISLANDS.find(I => I.id===id);
 
@@ -121,15 +141,25 @@ function showLights(from){
       <span class="lh-sub">${open ? 'Otok ' + I.name + ' · ' + H.year + '.' : need}</span>
       ${gold ? '<span class="lh-gold">★ Zlatni</span>' : open ? '<span class="lh-gold dim">Sve zvjezdice otoka ga pozlate</span>' : ''}
     </button>`;
-  }).join('') + `<div class="lh-more">Novi svjetionici stižu s novim otocima.</div>`;
+  }).join('')
+  // Nagradni svjetionik iz dnevnih razina, vidljiv kad se dnevne razine otvore
+  + (dailyOpen() ? Object.keys(BONUS).map(id => {
+      const H = BONUS[id], open = bonusOpen(), need = `Dnevne razine: ${Math.min(daily.parts, DAY_PARTS)} od ${DAY_PARTS} dijelova`;
+      return `<button class="lh-card ${open ? '' : 'locked'}" data-id="${id}" ${open ? '' : 'disabled'} aria-label="${open ? H.name : 'Zaključan svjetionik. ' + need}">
+        ${lighthouseArt(id)}
+        <span class="lh-name">${open ? H.name : '???'}</span>
+        <span class="lh-sub">${open ? 'Nagrada · ' + H.year + '.' : need}</span>
+      </button>`;
+    }).join('') : '')
+  + `<div class="lh-more">Novi svjetionici stižu s novim otocima.</div>`;
   $('lightsGrid').querySelectorAll('.lh-card:not(.locked)').forEach(b => b.onclick = () => openLight(b.dataset.id));
   window.scrollTo(0, 0);
 }
 
 function openLight(id){
-  const H = LIGHTHOUSES[id], I = isleOf(id);
+  const H = lightOf(id), I = isleOf(id);
   $('lightBody').innerHTML = `${lighthouseArt(id)}
-    <span class="eyebrow">Za otok ${I.name}</span>
+    <span class="eyebrow">${I ? 'Za otok ' + I.name : 'Nagrada za dnevne razine'}</span>
     <h2>${H.name}</h2>
     <p>${H.about}</p>
     ${H.note ? `<p class="lh-note">${H.note}</p>` : ''}

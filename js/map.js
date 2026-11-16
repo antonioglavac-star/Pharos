@@ -128,13 +128,7 @@ function renderEnd(){
     <div class="ctrl-btns">${weak ? '<button class="btn primary" id="endStars">Skupi zvjezdice</button>' : ''}
       <button class="btn ${weak ? '' : 'primary'}" id="endShare">Podijeli igru</button></div>`;
   if (weak) $('endStars').onclick = () => showIsle(weak.id);
-  $('endShare').onclick = async () => {
-    const url = location.origin + location.pathname.replace(/index\.html$/, '');
-    try {
-      if (navigator.share) await navigator.share({ title:'Pharos', text:'Upali svjetla Jadrana, otok po otok.', url });
-      else { await navigator.clipboard.writeText(url); $('endShare').textContent = 'Link je kopiran'; }
-    } catch (e) {}
-  };
+  $('endShare').onclick = () => share('Pharos: upali svjetla Jadrana, otok po otok.', $('endShare'));
 }
 
 // Magla rata: oblak dima nad svakim skrivenim otokom; more, kopno i otkriveni otoci ostaju vidljivi. Dim je šum

@@ -33,7 +33,9 @@ Kad igrač osvijetli otok, dobije jedan **stvarni** svjetionik (`js/lighthouses.
 - `js/map.js` – karta otoka i kartica odabranog otoka; dodir na otvoren otok otvara ekran otoka
 - `js/lighthouses.js` – kolekcija svjetionika (`LIGHTHOUSES`, crteži, ekran `#lights` i prozor `#lightDlg`)
 - `js/island.js` – ekran otoka (`#isle`): obris otoka i staza razina oko obale; dodir na razinu je pokreće. Razine su jednako razmaknute po glatkoj liniji oko otoka, počevši od najzapadnije točke
-- `js/app.js` – ponašanje kao aplikacija: tipka „natrag” na Androidu (prozor → razina → otok → karta → izbornik), rad bez interneta, gumb „Dodaj na početni zaslon” i kôd napretka u Postavkama (oblik `PH1.vis-3323.bisevo-33…`, znamenka po broju iz ID-a razine)
+- `js/lang.js` – jezici. Hrvatski je izvorni i sav tekst u igri piše se na hrvatskom. Za engleski ova datoteka prevodi tekst u trenutku kad se pojavi na ekranu (popis `EN` za točan tekst, `EN_RULES` za tekst s brojevima i imenima). **Svaki novi ili izmijenjeni tekst u igri treba dodati i u `lang.js`**, inače na engleskom ostaje hrvatski. Jezik se bira u Postavkama (ključ `svjetionik-jezik`); prvi put se uzima jezik uređaja. Uređivač razina je samo na hrvatskom
+- `js/daily.js` i `js/daily-levels.js` – dnevna razina (vidi „Dnevna razina”). Popis od 90 razina stvara `tools/gen-daily.js` (`node tools/gen-daily.js . 90 <izlaz>`, pa sadržaj ide u `const DAILY = [ … ]`)
+- `js/app.js` – dijeljenje (`share`, slika svjetionika `lightImage`) i ponašanje kao aplikacija: tipka „natrag” na Androidu (prozor → razina → otok → karta → izbornik), rad bez interneta, gumb „Dodaj na početni zaslon” i kôd napretka u Postavkama (oblik `PH1.vis-3323.bisevo-33…`, znamenka po broju iz ID-a razine)
 - `sw.js` – rad bez interneta: s mrežom uvijek svježa verzija, bez mreže spremljena kopija. Popis datoteka ne postoji; kopiju puni `app.js` onim što je stranica učitala
 - `js/chart.js` – obrisi obale i otoka prema OpenStreetMapu (stvara ga `tools/build-chart.js`, ne mijenjati ručno; upute su na vrhu alata). Navođenje izvora „© OpenStreetMap” mora ostati na karti i u „O igri”
 - `assets/` – Antonijev logo i ikona: `pharos-logo.png` i `pharos-app-icon.png` su izvornici (ne mijenjati), a `logo.webp` (prozirna pozadina, 760 px), `icon-*.png` i `share.jpg` (slika 1200×630 koja se vidi kad netko podijeli link; adresa je upisana u `index.html`) su pripremljene verzije za igru. `assets/fonts/` su fontovi igre (bez Google Fontsa; `@font-face` je na vrhu `style.css`)
@@ -57,6 +59,22 @@ Nema build koraka ni ovisnosti. Igra se pokreće otvaranjem `index.html` u pregl
 - Boje imaju i znak: crvena je romb, plava krug, isti na filteru i na jedru (`ICONS.mark` u `engine.js`). Novu boju treba dodati i tamo.
 - Položen mobitel dobije poruku da ga treba uspraviti; ploča nikad nije viša od zaslona.
 - Kad su svi otoci osvijetljeni, karta pokaže završnu karticu (`renderEnd`): lov na zvjezdice i „Podijeli igru”. Brojači otoka broje samo otoke koji imaju razine.
+
+## Dnevna razina (ugrađeno)
+
+- Gumb u izborniku pojavi se kad je osvijetljen prvi otok. Svi igrači isti dan dobiju istu razinu: bira se po datumu (po satu igrača, od ponoći) iz popisa `DAILY`, koji se ponavlja nakon 90 dana.
+- Koristi samo predmete s Visa (ogledala, prizma, filteri), cilj je 4 do 6 poteza.
+- Propušten dan nema posljedica. Ne utječe na otoke ni na njihove zvjezdice.
+- Nagrada: prvo rješenje dana daje jedan dio svjetionika; 7 dijelova (`DAY_PARTS`) sastavi nagradni svjetionik Veli rat u kolekciji (`BONUS` u `lighthouses.js`, podaci s Plovputa, crtež bez fotografije: Antonio treba provjeriti). Kad se doda novi nagradni svjetionik, treba proširiti `bonusOpen`.
+- Uspoređivanje: gumb „Podijeli rezultat” (tekst sa zvjezdicama i brojem poteza), bez poslužitelja.
+- Sprema se pod ključem `svjetionik-dnevna`; broj dijelova ulazi i u kôd napretka.
+- Još nije napravljeno: kalendar propuštenih dana (dio paketa „Ukloni reklame”) i ljestvica.
+
+## Što čeka Antonija (ne može se riješiti kodom)
+
+- **Reklame i paket „Ukloni reklame”:** traže račun kod oglasne mreže i, za ozbiljniju zaradu, objavu u Google Playu (račun 25 USD jednokratno) i App Storeu. Mjesto za dobrovoljnu reklamu već postoji: potrošena pomoć „Pokaži potez”.
+- **Suradnje:** turističke zajednice otoka i Plovput.
+- **Provjera:** zanimljivosti otoka, podaci i crteži svjetionika (posebno Struga i Veli rat), engleski prijevod.
 
 ## Statistika
 
@@ -128,7 +146,7 @@ Pomoć „Pokaži potez” (`findHint` u `game.js`) iz trenutnog stanja traži n
 
 ## Backlog
 
-### Dnevna razina (Antonijeva odluka, još nije ugrađeno)
+### Dnevna razina (Antonijeva odluka; osnovni dio je ugrađen, vidi „Dnevna razina (ugrađeno)”)
 
 - **Svima ista:** svaki dan svi igrači dobiju istu razinu i mogu se uspoređivati.
 - **Dostupnost:** otvara se tek kad igrač odigra prvi otok (Vis).
@@ -149,4 +167,4 @@ Još treba odlučiti:
 - Vizual: mornarsko plava podloga, tanke linije boje pijeska (`--sand`) kao na staroj pomorskoj karti; jedina topla boja je zraka svjetla (`--beam`)
 - Ploča razine ima oblik otoka (polje `shape`). Igra zaglađuje obalu i dodaje blage valove (uvijek iste za istu razinu, ovise o ID-u). Ideja za kasnije: obris prema pravom otoku
 - Mora raditi na mobitelu (oko 400 px širine) i podržati `prefers-reduced-motion`
-- Tekst u igri je na hrvatskom
+- Tekst u igri piše se na hrvatskom, a engleski prijevod ide u `js/lang.js`

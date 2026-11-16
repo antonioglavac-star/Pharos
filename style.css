@@ -131,6 +131,10 @@ html,body{overflow-x:clip}
 @media (orientation:landscape) and (max-height:480px){
   body::after{content:"Okreni mobitel uspravno za igru.";position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:24px;text-align:center;background:var(--sea);color:var(--sand);font:700 18px var(--body)}
 }
+#dailyBtn .tick{color:#7fd39b}
+#dailyBtn .dot-new{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--beam);margin-left:4px;vertical-align:1px}
+html[lang="en"] body::after{content:"Turn your phone upright to play."}
+[data-lang][aria-pressed="true"]{border-color:var(--beam);color:var(--beam)}
 .gold-note{margin:0;color:var(--muted);font-size:14px}
 .gold-note.got{color:var(--beam)}
 .lh-gold{font-size:12px;font-weight:700;color:var(--beam)}
